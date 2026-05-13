@@ -34,4 +34,5 @@ build/
 
 log
 application-test.properties
+application-dev.properties
 application-prod.properties
