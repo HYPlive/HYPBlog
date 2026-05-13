@@ -1,0 +1,15 @@
+
+> blog-cms@2.0.0 serve
+> vue-cli-service serve
+
+ INFO  Starting development server...
+ DONE  Compiled successfully in 2696ms17:24:12
+
+
+  App running at:
+  - Local:   http://localhost:8079/ 
+  - Network: unavailable
+
+  Note that the development build is not optimized.
+  To create a production build, run npm run build.
+
