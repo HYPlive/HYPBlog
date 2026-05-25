@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface BlogService {
-	List<Blog> getListByTitleAndCategoryId(String title, Integer categoryId);
+	List<Blog> getListByTitleAndCategoryId(String title, Integer categoryId, String status);
 
 	List<SearchBlog> getSearchBlogListByQueryAndIsPublished(String query);
 
@@ -37,6 +37,8 @@ public interface BlogService {
 
 	void saveBlog(top.hyp.model.dto.Blog blog);
 
+	void saveDraft(top.hyp.model.dto.Blog blog);
+
 	void saveBlogTag(Long blogId, Long tagId);
 
 	void updateBlogRecommendById(Long blogId, Boolean recommend);
@@ -58,6 +60,8 @@ public interface BlogService {
 	String getBlogPassword(Long blogId);
 
 	void updateBlog(top.hyp.model.dto.Blog blog);
+
+	void updateDraft(top.hyp.model.dto.Blog blog);
 
 	int countBlogByIsPublished();
 

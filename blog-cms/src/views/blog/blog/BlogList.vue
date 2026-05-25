@@ -107,6 +107,7 @@
 				queryInfo: {
 					title: '',
 					categoryId: null,
+					status: 'FINISHED',
 					pageNum: 1,
 					pageSize: 10
 				},

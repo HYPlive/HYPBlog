@@ -35,6 +35,7 @@ public class Blog {
 	private Integer words;//文章字数
 	private Integer readTime;//阅读时长(分钟)
 	private String password;//密码保护
+	private String status;//文章编辑状态：DRAFT/FINISHED
 
 	private User user;//文章作者(因为是个人博客，也可以不加作者字段，暂且加上)
 	private Category category;//文章分类

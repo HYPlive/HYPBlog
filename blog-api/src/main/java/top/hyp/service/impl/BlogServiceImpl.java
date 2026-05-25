@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.hyp.constant.BlogStatusConstants;
 import top.hyp.constant.RedisKeyConstants;
 import top.hyp.entity.Blog;
 import top.hyp.exception.NotFoundException;
@@ -70,8 +71,8 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
-	public List<Blog> getListByTitleAndCategoryId(String title, Integer categoryId) {
-		return blogMapper.getListByTitleAndCategoryId(title, categoryId);
+	public List<Blog> getListByTitleAndCategoryId(String title, Integer categoryId, String status) {
+		return blogMapper.getListByTitleAndCategoryId(title, categoryId, status);
 	}
 
 	@Override
@@ -266,7 +267,7 @@ public class BlogServiceImpl implements BlogService {
 	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void deleteBlogTagByBlogId(Long blogId) {
-		if (blogMapper.deleteBlogTagByBlogId(blogId) == 0) {
+		if (blogMapper.deleteBlogTagByBlogId(blogId) < 0) {
 			throw new PersistenceException("维护博客标签关联表失败");
 		}
 	}
@@ -274,11 +275,22 @@ public class BlogServiceImpl implements BlogService {
 	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void saveBlog(top.hyp.model.dto.Blog blog) {
+		blog.setStatus(BlogStatusConstants.FINISHED);
 		if (blogMapper.saveBlog(blog) != 1) {
 			throw new PersistenceException("添加博客失败");
 		}
 		redisService.saveKVToHash(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId(), 0);
 		deleteBlogRedisCache();
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void saveDraft(top.hyp.model.dto.Blog blog) {
+		blog.setStatus(BlogStatusConstants.DRAFT);
+		if (blogMapper.saveBlog(blog) != 1) {
+			throw new PersistenceException("添加草稿失败");
+		}
+		redisService.saveKVToHash(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId(), 0);
 	}
 
 	@Transactional(rollbackFor = Exception.class)
@@ -376,10 +388,21 @@ public class BlogServiceImpl implements BlogService {
 	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void updateBlog(top.hyp.model.dto.Blog blog) {
+		blog.setStatus(BlogStatusConstants.FINISHED);
 		if (blogMapper.updateBlog(blog) != 1) {
 			throw new PersistenceException("更新博客失败");
 		}
 		deleteBlogRedisCache();
+		redisService.saveKVToHash(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId(), blog.getViews());
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void updateDraft(top.hyp.model.dto.Blog blog) {
+		blog.setStatus(BlogStatusConstants.DRAFT);
+		if (blogMapper.updateBlog(blog) != 1) {
+			throw new PersistenceException("更新草稿失败");
+		}
 		redisService.saveKVToHash(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId(), blog.getViews());
 	}
 

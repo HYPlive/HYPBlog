@@ -43,6 +43,7 @@ CREATE TABLE `blog`  (
   `category_id` bigint(0) NOT NULL COMMENT '文章分类',
   `is_top` bit(1) NOT NULL COMMENT '是否置顶',
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '密码保护',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'FINISHED' COMMENT '文章编辑状态：DRAFT草稿，FINISHED已完成',
   `user_id` bigint(0) NULL DEFAULT NULL COMMENT '文章作者',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `type_id`(`category_id`) USING BTREE,

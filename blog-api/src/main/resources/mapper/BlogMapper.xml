@@ -19,6 +19,7 @@
         <result property="words" column="words"/>
         <result property="readTime" column="read_time"/>
         <result property="password" column="password"/>
+        <result property="status" column="status"/>
         <association property="user" javaType="top.hyp.entity.User">
             <id property="id" column="user_id"/>
             <result property="username" column="username"/>
@@ -44,7 +45,7 @@
     <select id="getListByTitleAndCategoryId" resultMap="blog">
         <bind name="titlePattern" value="'%' + title + '%'"/>
         select b.id, b.title, b.first_picture, b.create_time, b.update_time, b.is_published, b.is_recommend, b.is_appreciation,
-        b.is_comment_enabled, b.is_top, b.password,
+        b.is_comment_enabled, b.is_top, b.password, b.status, b.words, b.read_time,
         c.id as category_id, c.category_name
         from blog as b left join category as c on b.category_id=c.id
         <where>
@@ -53,6 +54,9 @@
             </if>
             <if test="categoryId!=null">
                 and b.category_id=#{categoryId}
+            </if>
+            <if test="status!=null and status!=''">
+                and b.status=#{status}
             </if>
         </where>
     </select>
@@ -68,7 +72,7 @@
         <bind name="queryPattern" value="'%' + query + '%'"/>
         select id, title, content
         from blog
-        where is_published=true and password='' and content like #{queryPattern}
+        where is_published=true and status='FINISHED' and password='' and content like #{queryPattern}
     </select>
 
     <resultMap id="blogIdAndTitle" type="top.hyp.model.vo.BlogIdAndTitle">
@@ -91,7 +95,7 @@
     <select id="getNewBlogListByIsPublished" resultMap="newBlog">
         select id, title, password
         from blog
-        where is_published=true
+        where is_published=true and status='FINISHED'
         order by create_time desc
     </select>
 
@@ -114,28 +118,28 @@
     <select id="getBlogInfoListByIsPublished" resultMap="blogInfo">
         select b.id, b.title, b.description, b.is_top, b.create_time, b.views, b.words, b.read_time, b.password, c.category_name
         from blog as b left join category as c on b.category_id=c.id
-        where b.is_published=true
+        where b.is_published=true and b.status='FINISHED'
     </select>
 
     <!--根据分类name查询公开博客List-->
     <select id="getBlogInfoListByCategoryNameAndIsPublished" resultMap="blogInfo">
         select b.id, b.title, b.description, b.is_top, b.create_time, b.views, b.words, b.read_time, b.password, c.category_name
         from category as c left join blog as b on b.category_id=c.id
-        where c.category_name=#{categoryName} and b.is_published=true
+        where c.category_name=#{categoryName} and b.is_published=true and b.status='FINISHED'
     </select>
 
     <!--根据标签name查询公开博客List-->
     <select id="getBlogInfoListByTagNameAndIsPublished" resultMap="blogInfo">
         select b.id, b.title, b.description, b.is_top, b.create_time, b.views, b.words, b.read_time, b.password, c.category_name
         from (((tag as t left join blog_tag as bt on t.id=bt.tag_id) left join blog as b on bt.blog_id=b.id) left join category as c on b.category_id=c.id)
-        where t.tag_name=#{tagName} and b.is_published=true
+        where t.tag_name=#{tagName} and b.is_published=true and b.status='FINISHED'
     </select>
 
     <!--查询公开博客年月List-->
     <select id="getGroupYearMonthByIsPublished" resultType="java.lang.String">
         select date_format(create_time, "%Y年%m月")
         from blog
-        where is_published=true
+        where is_published=true and status='FINISHED'
         group by date_format(create_time, "%Y年%m月")
         order by date_format(create_time, "%Y年%m月") desc
     </select>
@@ -151,7 +155,7 @@
     <select id="getArchiveBlogListByYearMonthAndIsPublished" resultMap="archiveBlog">
         select id, title, password, date_format(create_time, "%d日") as create_day
         from blog
-        where date_format(create_time, "%Y年%m月")=#{yearMonth} and is_published=true
+        where date_format(create_time, "%Y年%m月")=#{yearMonth} and is_published=true and status='FINISHED'
         order by create_time desc
     </select>
 
@@ -167,7 +171,7 @@
     <select id="getRandomBlogListByLimitNumAndIsPublishedAndIsRecommend" resultMap="randomBlog">
         select id, title, password, create_time, first_picture
         from blog
-        where is_published=true and is_recommend=true
+        where is_published=true and status='FINISHED' and is_recommend=true
         order by rand() limit #{limitNum}
     </select>
 
@@ -194,9 +198,9 @@
     <!--添加博客-->
     <insert id="saveBlog" parameterType="top.hyp.model.dto.Blog" useGeneratedKeys="true" keyProperty="id">
         insert into blog (title, first_picture, content, description, is_published, is_recommend, is_appreciation, is_comment_enabled,
-        is_top, create_time, update_time, views, words, read_time, category_id, user_id, password)
+        is_top, create_time, update_time, views, words, read_time, category_id, user_id, password, status)
         values (#{title}, #{firstPicture}, #{content}, #{description}, #{published}, #{recommend}, #{appreciation}, #{commentEnabled},
-        #{top}, #{createTime}, #{updateTime}, #{views}, #{words}, #{readTime}, #{category.id}, #{user.id}, #{password})
+        #{top}, #{createTime}, #{updateTime}, #{views}, #{words}, #{readTime}, #{category.id}, #{user.id}, #{password}, #{status})
     </insert>
 
     <!--更新博客推荐状态-->
@@ -224,7 +228,7 @@
     <!--按id查询博客-->
     <select id="getBlogById" resultMap="blog">
         select b.id, b.title, b.first_picture, b.content, b.description, b.is_recommend, b.is_published, b.is_appreciation,
-        b.is_comment_enabled, b.is_top, b.create_time, b.update_time, b.views, b.words, b.read_time, b.password,
+        b.is_comment_enabled, b.is_top, b.create_time, b.update_time, b.views, b.words, b.read_time, b.password, b.status,
         c.id as category_id, c.category_name,
         bt.tag_id as tag_id, t.tag_name as tag_name, t.color
         from (((blog as b left join category as c on b.category_id=c.id) left join blog_tag as bt on b.id=bt.blog_id) left join tag as t on bt.tag_id=t.id)
@@ -265,7 +269,7 @@
         c.category_name,
         t.tag_name as tag_name, t.color
         from (((blog as b left join category as c on b.category_id=c.id) left join blog_tag as bt on b.id=bt.blog_id) left join tag as t on bt.tag_id=t.id)
-        where b.id=#{id} and b.is_published=true
+        where b.id=#{id} and b.is_published=true and b.status='FINISHED'
     </select>
 
     <!--查询受密码保护文章密码-->
@@ -278,28 +282,30 @@
         update blog set title=#{title}, first_picture=#{firstPicture}, content=#{content}, description=#{description},
         is_recommend=#{recommend}, is_published=#{published}, is_appreciation=#{appreciation}, is_comment_enabled=#{commentEnabled},
         is_top=#{top}, create_time=#{createTime}, update_time=#{updateTime}, views=#{views},
-        words=#{words}, read_time=#{readTime}, category_id=#{category.id}, password=#{password}
+        words=#{words}, read_time=#{readTime}, category_id=#{category.id}, password=#{password}, status=#{status}
         where id=#{id}
     </update>
 
     <!--查询博客总数-->
     <select id="countBlog" resultType="java.lang.Integer">
-        select count(*) from blog
+        select count(*) from blog where status='FINISHED'
     </select>
 
     <!--查询公开博客总数-->
     <select id="countBlogByIsPublished" resultType="java.lang.Integer">
-        select count(*) from blog where is_published=true
+        select count(*) from blog where is_published=true and status='FINISHED'
     </select>
 
     <!--按分类id查询博客数量-->
     <select id="countBlogByCategoryId" resultType="java.lang.Integer">
-        select count(*) from blog where category_id=#{categoryId}
+        select count(*) from blog where category_id=#{categoryId} and status='FINISHED'
     </select>
 
     <!--按标签id查询博客数量-->
     <select id="countBlogByTagId" resultType="java.lang.Integer">
-        select count(*) from blog_tag where tag_id=#{tagId}
+        select count(*)
+        from blog_tag as bt left join blog as b on bt.blog_id=b.id
+        where bt.tag_id=#{tagId} and b.status='FINISHED'
     </select>
 
     <!--查询博客是否启用评论-->
@@ -319,6 +325,6 @@
 
     <!--查询每个分类的博客数量-->
     <select id="getCategoryBlogCountList" resultMap="categoryBlogCount">
-        select category_id, count(category_id) as blog_count from blog group by category_id
+        select category_id, count(category_id) as blog_count from blog where status='FINISHED' group by category_id
     </select>
 </mapper>

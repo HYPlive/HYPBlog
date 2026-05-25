@@ -71,6 +71,12 @@ const routes = [
 				meta: {title: '文章管理', icon: 'el-icon-s-order'}
 			},
 			{
+				path: 'draft/list',
+				name: 'DraftList',
+				component: () => import('@/views/blog/blog/DraftList'),
+				meta: {title: '草稿管理', icon: 'el-icon-document'}
+			},
+			{
 				path: 'moment/list',
 				name: 'MomentList',
 				component: () => import('@/views/blog/moment/MomentList'),
