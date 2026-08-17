@@ -55,9 +55,7 @@
             <if test="categoryId!=null">
                 and b.category_id=#{categoryId}
             </if>
-            <if test="status!=null and status!=''">
-                and b.status=#{status}
-            </if>
+            and b.status='FINISHED'
         </where>
     </select>
 
@@ -82,7 +80,7 @@
 
     <!--查询所有博客id和title-->
     <select id="getIdAndTitleList" resultMap="blogIdAndTitle">
-        select id, title from blog order by create_time desc
+        select id, title from blog where status='FINISHED' order by create_time desc
     </select>
 
     <resultMap id="newBlog" type="top.hyp.model.vo.NewBlog">
@@ -177,7 +175,7 @@
 
     <!--查询所有文章的浏览量-->
     <select id="getBlogViewsList" resultType="top.hyp.model.dto.BlogView">
-        select id, views from blog
+        select id, views from blog where status='FINISHED'
     </select>
 
     <!--按id删除博客-->
@@ -232,7 +230,7 @@
         c.id as category_id, c.category_name,
         bt.tag_id as tag_id, t.tag_name as tag_name, t.color
         from (((blog as b left join category as c on b.category_id=c.id) left join blog_tag as bt on b.id=bt.blog_id) left join tag as t on bt.tag_id=t.id)
-        where b.id=#{id}
+        where b.id=#{id} and b.status='FINISHED'
     </select>
 
     <!--按id查询博客标题-->
@@ -298,14 +296,14 @@
 
     <!--按分类id查询博客数量-->
     <select id="countBlogByCategoryId" resultType="java.lang.Integer">
-        select count(*) from blog where category_id=#{categoryId} and status='FINISHED'
+        select count(*) from blog where category_id=#{categoryId}
     </select>
 
     <!--按标签id查询博客数量-->
     <select id="countBlogByTagId" resultType="java.lang.Integer">
         select count(*)
         from blog_tag as bt left join blog as b on bt.blog_id=b.id
-        where bt.tag_id=#{tagId} and b.status='FINISHED'
+        where bt.tag_id=#{tagId}
     </select>
 
     <!--查询博客是否启用评论-->

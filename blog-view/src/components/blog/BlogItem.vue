@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="ui padded attached segment m-padded-tb-large m-margin-bottom-big m-box" v-for="item in blogList" :key="item.id">
+		<div class="ui padded attached segment m-padded-tb-large m-margin-bottom-big m-box blog-item-card" v-for="item in blogList" :key="item.id">
 			<div class="ui large red right corner label" v-if="item.top">
 				<i class="arrow alternate circle up icon"></i>
 			</div>
@@ -27,12 +27,11 @@
 							<div class="item m-common-black">
 								<i class="small clock icon"></i><span>阅读时长≈{{ item.readTime }}分</span>
 							</div>
+							<router-link :to="`/category/${item.category.name}`" class="item blog-category-meta">
+								<i class="small folder open icon"></i><span>{{ item.category.name }}</span>
+							</router-link>
 						</div>
 					</div>
-					<!--分类-->
-					<router-link :to="`/category/${item.category.name}`" class="ui orange large ribbon label">
-						<i class="small folder open icon"></i><span class="m-text-500">{{ item.category.name }}</span>
-					</router-link>
 					<!--文章Markdown描述-->
 					<div class="typo m-padded-tb-small line-numbers match-braces rainbow-braces" v-lazy-container="{selector: 'img'}" v-viewer v-html="item.description"></div>
 					<!--阅读全文按钮-->
@@ -71,5 +70,29 @@
 </script>
 
 <style scoped>
+	.blog-item-card {
+		position: relative;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, .55) !important;
+		border-radius: 16px !important;
+		box-shadow: 0 12px 32px rgba(20, 35, 50, .10) !important;
+	}
 
+	.blog-item-card >>> .right.corner.label {
+		border-top-right-radius: 16px !important;
+	}
+
+	.blog-category-meta {
+		color: #e67e22 !important;
+		font-weight: 500;
+	}
+
+	.blog-category-meta i {
+		color: #e67e22 !important;
+	}
+
+	.blog-category-meta:hover,
+	.blog-category-meta:hover i {
+		color: #d35400 !important;
+	}
 </style>

@@ -105,7 +105,8 @@
 
 <script>
 	import Breadcrumb from "@/components/Breadcrumb";
-	import {getCategoryAndTag, saveBlog, saveDraft, getBlogById, updateBlog, updateDraft} from '@/api/blog'
+	import {getCategoryAndTag, saveBlog, getBlogById, updateBlog} from '@/api/blog'
+	import {saveDraft, getDraftById, updateDraft} from '@/api/draft'
 
 	export default {
 		name: "WriteBlog",
@@ -151,7 +152,7 @@
 		created() {
 			this.getData()
 			if (this.$route.params.id) {
-				this.getBlog(this.$route.params.id)
+				this.getEditData(this.$route.params.id)
 			}
 		},
 		methods: {
@@ -161,8 +162,9 @@
 					this.tagList = res.data.tags
 				})
 			},
-			getBlog(id) {
-				getBlogById(id).then(res => {
+			getEditData(id) {
+				const request = this.$route.name === 'EditDraft' ? getDraftById : getBlogById
+				request(id).then(res => {
 					this.computeCategoryAndTag(res.data)
 					this.form = res.data
 					this.radio = this.form.published ? (this.form.password !== '' ? 3 : 1) : 2
@@ -179,7 +181,7 @@
 				this.form.status = 'DRAFT'
 				this.form.published = false
 				this.form.password = ''
-				if (this.$route.params.id) {
+				if (this.$route.name === 'EditDraft') {
 					this.form.category = null
 					this.form.tags = null
 					updateDraft(this.form).then(res => {

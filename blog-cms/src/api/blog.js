@@ -37,16 +37,6 @@ export function saveBlog(blog) {
 	})
 }
 
-export function saveDraft(blog) {
-	return axios({
-		url: 'blog/draft',
-		method: 'POST',
-		data: {
-			...blog
-		}
-	})
-}
-
 export function updateTop(id, top) {
 	return axios({
 		url: 'blog/top',
@@ -92,16 +82,6 @@ export function getBlogById(id) {
 export function updateBlog(blog) {
 	return axios({
 		url: 'blog',
-		method: 'PUT',
-		data: {
-			...blog
-		}
-	})
-}
-
-export function updateDraft(blog) {
-	return axios({
-		url: 'blog/draft',
 		method: 'PUT',
 		data: {
 			...blog

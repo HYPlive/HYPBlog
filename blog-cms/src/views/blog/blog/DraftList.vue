@@ -40,7 +40,7 @@
 </template>
 
 <script>
-	import {getDataByQuery, deleteBlogById} from '@/api/blog'
+	import {getDraftDataByQuery, deleteDraftById} from '@/api/draft'
 
 	export default {
 		name: "DraftList",
@@ -49,7 +49,6 @@
 				queryInfo: {
 					title: '',
 					categoryId: null,
-					status: 'DRAFT',
 					pageNum: 1,
 					pageSize: 10
 				},
@@ -63,10 +62,10 @@
 		},
 		methods: {
 			getData() {
-				getDataByQuery(this.queryInfo).then(res => {
-					this.draftList = res.data.blogs.list
+				getDraftDataByQuery(this.queryInfo).then(res => {
+					this.draftList = res.data.drafts.list
 					this.categoryList = res.data.categories
-					this.total = res.data.blogs.total
+					this.total = res.data.drafts.total
 				})
 			},
 			search() {
@@ -83,7 +82,7 @@
 				this.getData()
 			},
 			goDraftEditPage(id) {
-				this.$router.push(`/blog/edit/${id}`)
+				this.$router.push(`/blog/draft/edit/${id}`)
 			},
 			deleteDraftById(id) {
 				this.$confirm('此操作将永久删除该草稿，是否删除？', '提示', {
@@ -91,7 +90,7 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
-					deleteBlogById(id).then(res => {
+					deleteDraftById(id).then(res => {
 						this.msgSuccess(res.msg)
 						this.getData()
 					})

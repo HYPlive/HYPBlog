@@ -143,26 +143,70 @@
 
 <style>
 	.ui.fixed.menu .container {
-		width: 1400px !important;
+		width: 1180px !important;
 		margin-left: auto !important;
 		margin-right: auto !important;
 	}
 
 	.ui.fixed.menu {
-		transition: .3s ease-out;
+		min-height: 60px;
+		border: 0 !important;
+		background: rgba(255, 255, 255, .9) !important;
+		box-shadow: 0 3px 18px rgba(24, 39, 54, .08) !important;
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		transition: background .3s ease-out, box-shadow .3s ease-out;
 	}
 
 	.ui.inverted.pointing.menu.transparent {
+		background: linear-gradient(180deg, rgba(0, 0, 0, .24), rgba(0, 0, 0, .04) 72%, rgba(0, 0, 0, 0)) !important;
+		box-shadow: none !important;
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+	}
+
+	.ui.inverted.pointing.menu .item,
+	.ui.inverted.pointing.menu .header,
+	.ui.inverted.pointing.menu .el-dropdown-link,
+	.ui.inverted.pointing.menu .m-search input,
+	.ui.inverted.pointing.menu .m-search i {
+		color: rgba(38, 50, 56, .9) !important;
+		text-shadow: none;
+	}
+
+	.ui.inverted.pointing.menu.transparent .item,
+	.ui.inverted.pointing.menu.transparent .header,
+	.ui.inverted.pointing.menu.transparent .el-dropdown-link,
+	.ui.inverted.pointing.menu.transparent .m-search input,
+	.ui.inverted.pointing.menu.transparent .m-search i {
+		color: rgba(255, 255, 255, .95) !important;
+		text-shadow: 0 1px 8px rgba(0, 0, 0, .36);
+	}
+
+	.ui.inverted.pointing.menu .item,
+	.ui.inverted.pointing.menu .el-dropdown-link {
+		margin: 0 .35em !important;
+		border-radius: 0 !important;
+	}
+
+	.ui.inverted.pointing.menu .item:hover,
+	.ui.inverted.pointing.menu .active.item,
+	.ui.inverted.pointing.menu .active.item:hover,
+	.ui.inverted.pointing.menu .el-dropdown-link:hover {
 		background: transparent !important;
+		color: #48dbfb !important;
+	}
+
+	.ui.inverted.pointing.menu .active.item:after {
+		display: none !important;
 	}
 
 	.ui.inverted.pointing.menu.transparent .active.item:after {
-		background: transparent !important;
-		transition: .3s ease-out;
+		display: none !important;
 	}
 
 	.ui.inverted.pointing.menu.transparent .active.item:hover:after {
-		background: transparent !important;
+		display: none !important;
 	}
 
 	.el-dropdown-link {
@@ -173,19 +217,23 @@
 	}
 
 	.el-dropdown-menu {
-		margin: 7px 0 0 0 !important;
-		padding: 0 !important;
-		border: 0 !important;
-		background: #1b1c1d !important;
+		margin: 8px 0 0 0 !important;
+		padding: 6px !important;
+		border: 1px solid rgba(238, 242, 247, .95) !important;
+		border-radius: 8px !important;
+		background: rgba(255, 255, 255, .96) !important;
+		box-shadow: 0 10px 30px rgba(24, 39, 54, .12) !important;
 	}
 
 	.el-dropdown-menu__item {
+		border-radius: 6px !important;
 		padding: 0 15px !important;
-		color: rgba(255, 255, 255, .9) !important;
+		color: rgba(38, 50, 56, .88) !important;
 	}
 
 	.el-dropdown-menu__item:hover {
-		background: rgba(255, 255, 255, .08) !important;
+		background: rgba(72, 219, 251, .12) !important;
+		color: #00a7e0 !important;
 	}
 
 	.el-popper .popper__arrow::after {
@@ -202,14 +250,14 @@
 	}
 
 	.m-search input {
-		color: rgba(255, 255, 255, .9);;
 		border: 0px !important;
-		background-color: inherit;
+		background-color: transparent;
 		padding: .67857143em 2.1em .67857143em 1em;
 	}
 
-	.m-search i {
-		color: rgba(255, 255, 255, .9) !important;
+	.m-search input::placeholder {
+		color: inherit;
+		opacity: .72;
 	}
 
 	.m-search-item {

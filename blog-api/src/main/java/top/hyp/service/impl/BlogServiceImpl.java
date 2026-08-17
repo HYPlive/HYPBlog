@@ -71,8 +71,8 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
-	public List<Blog> getListByTitleAndCategoryId(String title, Integer categoryId, String status) {
-		return blogMapper.getListByTitleAndCategoryId(title, categoryId, status);
+	public List<Blog> getListByTitleAndCategoryId(String title, Integer categoryId) {
+		return blogMapper.getListByTitleAndCategoryId(title, categoryId);
 	}
 
 	@Override
@@ -285,16 +285,6 @@ public class BlogServiceImpl implements BlogService {
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveDraft(top.hyp.model.dto.Blog blog) {
-		blog.setStatus(BlogStatusConstants.DRAFT);
-		if (blogMapper.saveBlog(blog) != 1) {
-			throw new PersistenceException("添加草稿失败");
-		}
-		redisService.saveKVToHash(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId(), 0);
-	}
-
-	@Transactional(rollbackFor = Exception.class)
-	@Override
 	public void saveBlogTag(Long blogId, Long tagId) {
 		if (blogMapper.saveBlogTag(blogId, tagId) != 1) {
 			throw new PersistenceException("维护博客标签关联表失败");
@@ -348,13 +338,7 @@ public class BlogServiceImpl implements BlogService {
 		if (blog == null) {
 			throw new NotFoundException("博客不存在");
 		}
-		/**
-		 * 将浏览量设置为Redis中的最新值
-		 * 这里如果出现异常，查看第 152 行注释说明
-		 * @see BlogServiceImpl#setBlogViewsFromRedisToPageResult
-		 */
-		int view = (int) redisService.getValueByHashKey(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId());
-		blog.setViews(view);
+		blog.setViews((int) redisService.getValueByHashKey(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId()));
 		return blog;
 	}
 
@@ -370,13 +354,7 @@ public class BlogServiceImpl implements BlogService {
 			throw new NotFoundException("该博客不存在");
 		}
 		blog.setContent(MarkdownUtils.markdownToHtmlExtensions(blog.getContent()));
-		/**
-		 * 将浏览量设置为Redis中的最新值
-		 * 这里如果出现异常，查看第 152 行注释说明
-		 * @see BlogServiceImpl#setBlogViewsFromRedisToPageResult
-		 */
-		int view = (int) redisService.getValueByHashKey(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId());
-		blog.setViews(view);
+		blog.setViews((int) redisService.getValueByHashKey(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId()));
 		return blog;
 	}
 
@@ -393,16 +371,6 @@ public class BlogServiceImpl implements BlogService {
 			throw new PersistenceException("更新博客失败");
 		}
 		deleteBlogRedisCache();
-		redisService.saveKVToHash(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId(), blog.getViews());
-	}
-
-	@Transactional(rollbackFor = Exception.class)
-	@Override
-	public void updateDraft(top.hyp.model.dto.Blog blog) {
-		blog.setStatus(BlogStatusConstants.DRAFT);
-		if (blogMapper.updateBlog(blog) != 1) {
-			throw new PersistenceException("更新草稿失败");
-		}
 		redisService.saveKVToHash(RedisKeyConstants.BLOG_VIEWS_MAP, blog.getId(), blog.getViews());
 	}
 

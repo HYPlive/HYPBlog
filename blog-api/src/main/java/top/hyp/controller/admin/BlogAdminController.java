@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import top.hyp.annotation.OperationLogger;
-import top.hyp.constant.BlogStatusConstants;
 import top.hyp.entity.Blog;
 import top.hyp.entity.Category;
 import top.hyp.entity.Tag;
@@ -61,12 +60,11 @@ public class BlogAdminController {
 	@GetMapping("/blogs")
 	public Result blogs(@RequestParam(defaultValue = "") String title,
 	                    @RequestParam(defaultValue = "") Integer categoryId,
-	                    @RequestParam(defaultValue = "") String status,
 	                    @RequestParam(defaultValue = "1") Integer pageNum,
 	                    @RequestParam(defaultValue = "10") Integer pageSize) {
 		String orderBy = "create_time desc";
 		PageHelper.startPage(pageNum, pageSize, orderBy);
-		PageInfo<Blog> pageInfo = new PageInfo<>(blogService.getListByTitleAndCategoryId(title, categoryId, status));
+		PageInfo<Blog> pageInfo = new PageInfo<>(blogService.getListByTitleAndCategoryId(title, categoryId));
 		List<Category> categories = categoryService.getCategoryList();
 		Map<String, Object> map = new HashMap<>(4);
 		map.put("blogs", pageInfo);
@@ -170,12 +168,6 @@ public class BlogAdminController {
 		return getResult(blog, "save");
 	}
 
-	@OperationLogger("保存草稿")
-	@PostMapping("/blog/draft")
-	public Result saveDraft(@RequestBody top.hyp.model.dto.Blog blog) {
-		return getDraftResult(blog, "save");
-	}
-
 	/**
 	 * 更新博客
 	 *
@@ -186,12 +178,6 @@ public class BlogAdminController {
 	@PutMapping("/blog")
 	public Result updateBlog(@RequestBody top.hyp.model.dto.Blog blog) {
 		return getResult(blog, "update");
-	}
-
-	@OperationLogger("更新草稿")
-	@PutMapping("/blog/draft")
-	public Result updateDraft(@RequestBody top.hyp.model.dto.Blog blog) {
-		return getDraftResult(blog, "update");
 	}
 
 	/**
@@ -284,104 +270,4 @@ public class BlogAdminController {
 		}
 	}
 
-	private Result getDraftResult(top.hyp.model.dto.Blog blog, String type) {
-		prepareDraftBlog(blog);
-		Date date = new Date();
-		if ("save".equals(type)) {
-			blog.setCreateTime(date);
-			blog.setUpdateTime(date);
-			User user = new User();
-			user.setId(1L);
-			blog.setUser(user);
-			blogService.saveDraft(blog);
-			saveDraftTags(blog);
-			return Result.ok("草稿保存成功");
-		} else {
-			blog.setUpdateTime(date);
-			blogService.updateDraft(blog);
-			blogService.deleteBlogTagByBlogId(blog.getId());
-			saveDraftTags(blog);
-			return Result.ok("草稿更新成功");
-		}
-	}
-
-	private void prepareDraftBlog(top.hyp.model.dto.Blog blog) {
-		if (StringUtils.isEmpty(blog.getTitle())) {
-			blog.setTitle("未命名草稿");
-		}
-		if (blog.getFirstPicture() == null) {
-			blog.setFirstPicture("");
-		}
-		if (blog.getContent() == null) {
-			blog.setContent("");
-		}
-		if (blog.getDescription() == null) {
-			blog.setDescription("");
-		}
-		blog.setPublished(false);
-		blog.setRecommend(false);
-		blog.setAppreciation(false);
-		blog.setCommentEnabled(false);
-		blog.setTop(false);
-		blog.setPassword("");
-		blog.setViews(blog.getViews() == null || blog.getViews() < 0 ? 0 : blog.getViews());
-		int words = blog.getWords() == null || blog.getWords() < 0 ? countWords(blog.getContent()) : blog.getWords();
-		blog.setWords(words);
-		blog.setReadTime(blog.getReadTime() == null || blog.getReadTime() < 0 ? (int) Math.round(words / 200.0) : blog.getReadTime());
-		blog.setCategory(resolveDraftCategory(blog.getCate()));
-		blog.setStatus(BlogStatusConstants.DRAFT);
-	}
-
-	private Category resolveDraftCategory(Object cate) {
-		if (cate instanceof Integer) {
-			Category category = categoryService.getCategoryById(((Integer) cate).longValue());
-			if (category != null) {
-				return category;
-			}
-		} else if (cate instanceof String && !StringUtils.isEmpty((String) cate)) {
-			Category category = categoryService.getCategoryByName((String) cate);
-			if (category != null) {
-				return category;
-			}
-			Category c = new Category();
-			c.setName((String) cate);
-			categoryService.saveCategory(c);
-			return c;
-		}
-		Category uncategorized = categoryService.getCategoryByName("未分类");
-		if (uncategorized != null) {
-			return uncategorized;
-		}
-		Category c = new Category();
-		c.setName("未分类");
-		categoryService.saveCategory(c);
-		return c;
-	}
-
-	private void saveDraftTags(top.hyp.model.dto.Blog blog) {
-		List<Object> tagList = blog.getTagList();
-		if (tagList == null || tagList.isEmpty()) {
-			return;
-		}
-		for (Object t : tagList) {
-			Tag tag = null;
-			if (t instanceof Integer) {
-				tag = tagService.getTagById(((Integer) t).longValue());
-			} else if (t instanceof String && !StringUtils.isEmpty((String) t)) {
-				tag = tagService.getTagByName((String) t);
-				if (tag == null) {
-					tag = new Tag();
-					tag.setName((String) t);
-					tagService.saveTag(tag);
-				}
-			}
-			if (tag != null) {
-				blogService.saveBlogTag(blog.getId(), tag.getId());
-			}
-		}
-	}
-
-	private int countWords(String content) {
-		return content == null ? 0 : content.replaceAll("\\s+", "").length();
-	}
 }

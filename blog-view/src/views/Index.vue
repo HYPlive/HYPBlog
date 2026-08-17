@@ -1,10 +1,10 @@
 <template>
-	<div class="site">
+	<div class="site" :style="siteBackgroundStyle">
 		<!--顶部导航-->
 		<Nav :blogName="siteInfo.blogName" :categoryList="categoryList"/>
 		<!--首页大图 只在首页且pc端时显示-->
 		<div class="m-mobile-hide">
-			<Header v-if="$route.name==='home'"/>
+			<Header v-if="$route.name==='home'" :hitokoto="hitokoto" :backgroundImage="siteInfo.homeHeaderImage"/>
 		</div>
 
 		<div class="main">
@@ -82,7 +82,13 @@
 			}
 		},
 		computed: {
-			...mapState(['focusMode'])
+			...mapState(['focusMode']),
+			siteBackgroundStyle() {
+				const image = this.siteInfo.homeHeaderImage || '/img/header/hitokoto-bg.jpg.jpeg'
+				return {
+					backgroundImage: `url(${image})`
+				}
+			}
 		},
 		watch: {
 			//路由改变时，页面滚动至顶部
@@ -134,6 +140,10 @@
 		display: flex;
 		min-height: 100vh; /* 没有元素时，也把页面撑开至100% */
 		flex-direction: column;
+		background-position: center center;
+		background-size: cover;
+		background-repeat: no-repeat;
+		background-attachment: fixed;
 	}
 
 	.main {
@@ -157,5 +167,28 @@
 
 	.m-display-none {
 		display: none !important;
+	}
+
+	.site >>> .ui.segment,
+	.site >>> .ui.segments,
+	.site >>> .ui.card {
+		background: rgba(255, 255, 255, .88) !important;
+		backdrop-filter: blur(6px);
+	}
+
+	.site >>> .ui.secondary.segment,
+	.site >>> .ui.yellow.segment {
+		background: rgba(255, 255, 255, .72) !important;
+	}
+
+	.site >>> footer.ui.inverted.segment {
+		background: linear-gradient(180deg, rgba(18, 24, 32, .72), rgba(18, 24, 32, .9)) !important;
+		backdrop-filter: blur(12px) saturate(130%);
+	}
+
+	@media (max-width: 768px) {
+		.site {
+			background-attachment: scroll;
+		}
 	}
 </style>
