@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.hyp.mapper.TodoMapper">
+    <resultMap id="todo" type="top.hyp.entity.Todo">
+        <id property="id" column="id"/>
+        <result property="content" column="content"/>
+        <result property="status" column="status"/>
+        <result property="priority" column="priority"/>
+        <result property="sort" column="sort"/>
+        <result property="published" column="is_published"/>
+        <result property="discoveredTime" column="discovered_time"/>
+        <result property="completedTime" column="completed_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="durationMinutes" column="duration_minutes"/>
+    </resultMap>
+
+    <sql id="todoColumns">
+        id, content, status, priority, sort, is_published, discovered_time, completed_time, update_time,
+        TIMESTAMPDIFF(MINUTE, discovered_time, COALESCE(completed_time, NOW())) AS duration_minutes
+    </sql>
+
+    <select id="getTodoList" resultMap="todo">
+        SELECT <include refid="todoColumns"/> FROM todo
+        ORDER BY FIELD(status, 'TODO', 'IN_PROGRESS', 'DONE'), sort ASC, id DESC
+    </select>
+
+    <select id="getPublishedTodoList" resultMap="todo">
+        SELECT <include refid="todoColumns"/> FROM todo
+        WHERE is_published = 1
+        ORDER BY FIELD(status, 'TODO', 'IN_PROGRESS', 'DONE'), sort ASC, id DESC
+    </select>
+
+    <select id="getTodoById" resultMap="todo">
+        SELECT <include refid="todoColumns"/> FROM todo WHERE id = #{id}
+    </select>
+
+    <insert id="saveTodo" parameterType="top.hyp.entity.Todo" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO todo (content, status, priority, sort, is_published, discovered_time, completed_time, update_time)
+        VALUES (#{content}, #{status}, #{priority}, #{sort}, #{published}, #{discoveredTime}, #{completedTime}, #{updateTime})
+    </insert>
+
+    <update id="updateTodo">
+        UPDATE todo
+        SET content = #{content}, priority = #{priority}, is_published = #{published}, update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteTodoById">
+        DELETE FROM todo WHERE id = #{id}
+    </delete>
+
+    <update id="updatePublishedById">
+        UPDATE todo SET is_published = #{published}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateTodoStatus">
+        UPDATE todo
+        SET status = #{status}, completed_time = #{completedTime}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateTodoSort">
+        UPDATE todo SET sort = #{sort}, update_time = NOW() WHERE id = #{id}
+    </update>
+</mapper>
