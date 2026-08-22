@@ -1,6 +1,7 @@
 package top.hyp.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import top.hyp.entity.Blog;
 import top.hyp.model.dto.BlogView;
@@ -23,7 +24,7 @@ import java.util.List;
 @Mapper
 @Repository
 public interface BlogMapper {
-	List<Blog> getListByTitleAndCategoryId(String title, Integer categoryId);
+	List<Blog> getListByTitleAndCategoryId(@Param("title") String title, @Param("categoryId") Integer categoryId);
 
 	List<SearchBlog> getSearchBlogListByQueryAndIsPublished(String query);
 

@@ -269,4 +269,5 @@ public class BlogAdminController {
 			return Result.ok("更新成功");
 		}
 	}
+
 }

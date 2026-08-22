@@ -57,6 +57,9 @@
 
     <!--查询每个标签的博客数量-->
     <select id="getTagBlogCount" resultMap="tagBlogCount">
-        select tag_id, count(tag_id) as blog_count from blog_tag group by tag_id
+        select bt.tag_id, count(bt.tag_id) as blog_count
+        from blog_tag as bt left join blog as b on bt.blog_id=b.id
+        where b.status='FINISHED'
+        group by bt.tag_id
     </select>
 </mapper>

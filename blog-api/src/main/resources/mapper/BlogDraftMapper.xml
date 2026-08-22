@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.hyp.mapper.BlogDraftMapper">
+
+    <resultMap id="blogDraft" type="top.hyp.entity.Blog">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="content" column="content"/>
+        <result property="description" column="description"/>
+        <result property="published" column="is_published"/>
+        <result property="recommend" column="is_recommend"/>
+        <result property="appreciation" column="is_appreciation"/>
+        <result property="commentEnabled" column="is_comment_enabled"/>
+        <result property="top" column="is_top"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="views" column="views"/>
+        <result property="words" column="words"/>
+        <result property="readTime" column="read_time"/>
+        <result property="password" column="password"/>
+        <result property="status" column="status"/>
+        <association property="category" javaType="top.hyp.entity.Category">
+            <id property="id" column="category_id"/>
+            <result property="name" column="category_name"/>
+        </association>
+        <collection property="tags" javaType="top.hyp.entity.Tag">
+            <id property="id" column="tag_id"/>
+            <result property="name" column="tag_name"/>
+            <result property="color" column="color"/>
+        </collection>
+    </resultMap>
+
+    <select id="getListByTitleAndCategoryId" resultMap="blogDraft">
+        <bind name="titlePattern" value="'%' + title + '%'"/>
+        select b.id, b.title, b.first_picture, b.create_time, b.update_time, b.is_published, b.is_recommend, b.is_appreciation,
+        b.is_comment_enabled, b.is_top, b.password, b.status, b.words, b.read_time,
+        c.id as category_id, c.category_name
+        from blog as b left join category as c on b.category_id=c.id
+        <where>
+            b.status='DRAFT'
+            <if test="title!=null and title!=''">
+                and b.title like #{titlePattern}
+            </if>
+            <if test="categoryId!=null">
+                and b.category_id=#{categoryId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getDraftById" resultMap="blogDraft">
+        select b.id, b.title, b.first_picture, b.content, b.description, b.is_recommend, b.is_published, b.is_appreciation,
+        b.is_comment_enabled, b.is_top, b.create_time, b.update_time, b.views, b.words, b.read_time, b.password, b.status,
+        c.id as category_id, c.category_name,
+        bt.tag_id as tag_id, t.tag_name as tag_name, t.color
+        from (((blog as b left join category as c on b.category_id=c.id) left join blog_tag as bt on b.id=bt.blog_id) left join tag as t on bt.tag_id=t.id)
+        where b.id=#{id} and b.status='DRAFT'
+    </select>
+
+    <insert id="saveDraft" parameterType="top.hyp.model.dto.Blog" useGeneratedKeys="true" keyProperty="id">
+        insert into blog (title, first_picture, content, description, is_published, is_recommend, is_appreciation, is_comment_enabled,
+        is_top, create_time, update_time, views, words, read_time, category_id, user_id, password, status)
+        values (#{title}, #{firstPicture}, #{content}, #{description}, #{published}, #{recommend}, #{appreciation}, #{commentEnabled},
+        #{top}, #{createTime}, #{updateTime}, #{views}, #{words}, #{readTime}, #{category.id}, #{user.id}, #{password}, #{status})
+    </insert>
+
+    <update id="updateDraft">
+        update blog set title=#{title}, first_picture=#{firstPicture}, content=#{content}, description=#{description},
+        is_recommend=#{recommend}, is_published=#{published}, is_appreciation=#{appreciation}, is_comment_enabled=#{commentEnabled},
+        is_top=#{top}, update_time=#{updateTime}, views=#{views},
+        words=#{words}, read_time=#{readTime}, category_id=#{category.id}, password=#{password}, status=#{status}
+        where id=#{id} and status='DRAFT'
+    </update>
+
+    <delete id="deleteDraftById">
+        delete from blog where id=#{id} and status='DRAFT'
+    </delete>
+
+    <delete id="deleteDraftTagByDraftId">
+        delete from blog_tag where blog_id in (select id from blog where id=#{draftId} and status='DRAFT')
+    </delete>
+
+    <insert id="saveDraftTag">
+        insert into blog_tag (blog_id, tag_id) values (#{draftId}, #{tagId})
+    </insert>
+</mapper>

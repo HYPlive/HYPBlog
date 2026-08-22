@@ -1,0 +1,2 @@
+ALTER TABLE blog
+DROP COLUMN status;

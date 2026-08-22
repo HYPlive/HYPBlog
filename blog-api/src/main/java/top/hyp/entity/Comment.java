@@ -37,4 +37,5 @@ public class Comment {
 
 	private BlogIdAndTitle blog;//所属的文章
 	private List<Comment> replyComments = new ArrayList<>();//回复该评论的评论
+
 }

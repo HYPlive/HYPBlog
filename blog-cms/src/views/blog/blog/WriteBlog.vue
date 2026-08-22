@@ -58,6 +58,7 @@
 			</el-row>
 
 			<el-form-item style="text-align: right;">
+				<el-button v-if="!$route.params.id || form.status === 'DRAFT'" @click="saveAsDraft">保存草稿</el-button>
 				<el-button type="primary" @click="dialogVisible=true">保存</el-button>
 			</el-form-item>
 		</el-form>
@@ -105,6 +106,7 @@
 <script>
 	import Breadcrumb from "@/components/Breadcrumb";
 	import {getCategoryAndTag, saveBlog, getBlogById, updateBlog} from '@/api/blog'
+	import {saveDraft, getDraftById, updateDraft} from '@/api/draft'
 
 	export default {
 		name: "WriteBlog",
@@ -131,6 +133,7 @@
 					top: false,
 					published: false,
 					password: '',
+					status: 'FINISHED',
 				},
 				formRules: {
 					title: [{required: true, message: '请输入标题', trigger: 'change'}],
@@ -149,7 +152,7 @@
 		created() {
 			this.getData()
 			if (this.$route.params.id) {
-				this.getBlog(this.$route.params.id)
+				this.getEditData(this.$route.params.id)
 			}
 		},
 		methods: {
@@ -159,19 +162,38 @@
 					this.tagList = res.data.tags
 				})
 			},
-			getBlog(id) {
-				getBlogById(id).then(res => {
+			getEditData(id) {
+				const request = this.$route.name === 'EditDraft' ? getDraftById : getBlogById
+				request(id).then(res => {
 					this.computeCategoryAndTag(res.data)
 					this.form = res.data
 					this.radio = this.form.published ? (this.form.password !== '' ? 3 : 1) : 2
 				})
 			},
 			computeCategoryAndTag(blog) {
-				blog.cate = blog.category.id
+				blog.cate = blog.category ? blog.category.id : null
 				blog.tagList = []
-				blog.tags.forEach(item => {
+				;(blog.tags || []).forEach(item => {
 					blog.tagList.push(item.id)
 				})
+			},
+			saveAsDraft() {
+				this.form.status = 'DRAFT'
+				this.form.published = false
+				this.form.password = ''
+				if (this.$route.name === 'EditDraft') {
+					this.form.category = null
+					this.form.tags = null
+					updateDraft(this.form).then(res => {
+						this.msgSuccess(res.msg)
+						this.$router.push('/blog/draft/list')
+					})
+				} else {
+					saveDraft(this.form).then(res => {
+						this.msgSuccess(res.msg)
+						this.$router.push('/blog/draft/list')
+					})
+				}
 			},
 			submit() {
 				if (this.radio === 3 && (this.form.password === '' || this.form.password === null)) {
@@ -179,6 +201,7 @@
 				}
 				this.$refs.formRef.validate(valid => {
 					if (valid) {
+						this.form.status = 'FINISHED'
 						if (this.radio === 2) {
 							this.form.appreciation = false
 							this.form.recommend = false

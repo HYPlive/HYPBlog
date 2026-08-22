@@ -43,6 +43,7 @@ CREATE TABLE `blog`  (
   `category_id` bigint(0) NOT NULL COMMENT '文章分类',
   `is_top` bit(1) NOT NULL COMMENT '是否置顶',
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '密码保护',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'FINISHED' COMMENT '文章编辑状态：DRAFT草稿，FINISHED已完成',
   `user_id` bigint(0) NULL DEFAULT NULL COMMENT '文章作者',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `type_id`(`category_id`) USING BTREE,
@@ -250,32 +251,34 @@ INSERT INTO `site_setting` VALUES (3, 'footerImgTitle', '页脚图片标题', '�
 INSERT INTO `site_setting` VALUES (4, 'footerImgUrl', '页脚图片路径', '/img/qr.png', 1);
 INSERT INTO `site_setting` VALUES (5, 'copyright', 'Copyright', '{\"title\":\"Copyright © 2019 - 2022\",\"siteName\":\"NACCL\'S BLOG\"}', 1);
 INSERT INTO `site_setting` VALUES (6, 'beian', 'ICP备案号', '', 1);
-INSERT INTO `site_setting` VALUES (7, 'reward', '赞赏码', '/img/reward.jpg', 1);
-INSERT INTO `site_setting` VALUES (8, 'commentAdminFlag', '博主评论标识', '咕咕', 1);
-INSERT INTO `site_setting` VALUES (9, 'playlistServer', '播放器平台', 'netease', 1);
-INSERT INTO `site_setting` VALUES (10, 'playlistId', '播放器歌单', '3071528549', 1);
-INSERT INTO `site_setting` VALUES (11, 'avatar', '头像', '/img/avatar.jpg', 2);
-INSERT INTO `site_setting` VALUES (12, 'name', '昵称', 'Naccl', 2);
-INSERT INTO `site_setting` VALUES (13, 'rollText', '滚动个签', '\"云鹤当归天，天不迎我妙木仙；\",\"游龙当归海，海不迎我自来也。\"', 2);
-INSERT INTO `site_setting` VALUES (14, 'github', 'GitHub', 'https://github.com/Naccl', 2);
-INSERT INTO `site_setting` VALUES (15, 'telegram', 'Telegram', 'https://t.me/NacclOfficial', 2);
-INSERT INTO `site_setting` VALUES (16, 'qq', 'QQ', 'http://sighttp.qq.com/authd?IDKEY=', 2);
-INSERT INTO `site_setting` VALUES (17, 'bilibili', 'bilibili', 'https://space.bilibili.com/', 2);
-INSERT INTO `site_setting` VALUES (18, 'netease', '网易云音乐', 'https://music.163.com/#/user/home?id=', 2);
-INSERT INTO `site_setting` VALUES (19, 'email', 'email', 'mailto:you@example.com', 2);
-INSERT INTO `site_setting` VALUES (20, 'favorite', '自定义', '{\"title\":\"最喜欢的动漫 📺\",\"content\":\"异度侵入、春物语、NO GAME NO LIFE、实力至上主义的教室、辉夜大小姐、青春猪头少年不会梦到兔女郎学姐、路人女主、Re0、魔禁、超炮、俺妹、在下坂本、散华礼弥、OVERLORD、慎勇、人渣的本愿、白色相簿2、死亡笔记、DARLING in the FRANXX、鬼灭之刃\"}', 2);
-INSERT INTO `site_setting` VALUES (21, 'favorite', '自定义', '{\"title\":\"最喜欢我的女孩子们 🤤\",\"content\":\"芙兰达、土间埋、食蜂操祈、佐天泪爷、樱岛麻衣、桐崎千棘、02、亚丝娜、高坂桐乃、五更琉璃、安乐冈花火、一色彩羽、英梨梨、珈百璃、时崎狂三、可儿那由多、和泉纱雾、早坂爱\"}', 2);
-INSERT INTO `site_setting` VALUES (22, 'favorite', '自定义', '{\"title\":\"最喜欢玩的游戏 🎮\",\"content\":\"Stellaris、巫师、GTA、荒野大镖客、刺客信条、魔兽争霸、LOL、PUBG\"}', 2);
-INSERT INTO `site_setting` VALUES (23, 'badge', '徽标', '{\"title\":\"本博客已开源于 GitHub\",\"url\":\"https://github.com/Naccl/NBlog\",\"subject\":\"NBlog\",\"value\":\"Open Source\",\"color\":\"brightgreen\"}', 3);
-INSERT INTO `site_setting` VALUES (24, 'badge', '徽标', '{\"title\":\"由 Spring Boot 强力驱动\",\"url\":\"https://spring.io/projects/spring-boot/\",\"subject\":\"Powered\",\"value\":\"Spring Boot\",\"color\":\"blue\"}', 3);
-INSERT INTO `site_setting` VALUES (25, 'badge', '徽标', '{\"title\":\"Vue.js 客户端渲染\",\"url\":\"https://cn.vuejs.org/\",\"subject\":\"SPA\",\"value\":\"Vue.js\",\"color\":\"brightgreen\"}', 3);
-INSERT INTO `site_setting` VALUES (26, 'badge', '徽标', '{\"title\":\"UI 框架 Semantic-UI\",\"url\":\"https://semantic-ui.com/\",\"subject\":\"UI\",\"value\":\"Semantic-UI\",\"color\":\"semantic-ui\"}', 3);
-INSERT INTO `site_setting` VALUES (27, 'badge', '徽标', '{\"title\":\"阿里云提供服务器及域名相关服务\",\"url\":\"https://www.aliyun.com/\",\"subject\":\"VPS & DNS\",\"value\":\"Aliyun\",\"color\":\"blueviolet\"}', 3);
-INSERT INTO `site_setting` VALUES (28, 'badge', '徽标', '{\"title\":\"静态资源托管于 GitHub\",\"url\":\"https://github.com/\",\"subject\":\"OSS\",\"value\":\"GitHub\",\"color\":\"github\"}', 3);
-INSERT INTO `site_setting` VALUES (29, 'badge', '徽标', '{\"title\":\"jsDelivr 加速静态资源\",\"url\":\"https://www.jsdelivr.com/\",\"subject\":\"CDN\",\"value\":\"jsDelivr\",\"color\":\"orange\"}', 3);
-INSERT INTO `site_setting` VALUES (30, 'badge', '徽标', '{\"color\":\"lightgray\",\"subject\":\"CC\",\"title\":\"本站点采用 CC BY 4.0 国际许可协议进行许可\",\"url\":\"https://creativecommons.org/licenses/by/4.0/\",\"value\":\"BY 4.0\"}', 3);
-INSERT INTO `site_setting` VALUES (31, 'friendContent', '友链页面信息', '随机排序，不分先后。欢迎交换友链~(￣▽￣)~*\n\n* 昵称：Naccl\n* 一句话：游龙当归海，海不迎我自来也。\n* 网址：[https://naccl.top](https://naccl.top)\n* 头像URL：[https://naccl.top/img/avatar.jpg](https://naccl.top/img/avatar.jpg)\n\n仅凭个人喜好添加友链，请在收到我的回复邮件后再于贵站添加本站链接。原则上已添加的友链不会删除，如果你发现自己被移除了，恕不另行通知，只需和我一样做就好。\n\n', 4);
-INSERT INTO `site_setting` VALUES (32, 'friendCommentEnabled', '友链页面评论开关', '1', 4);
+INSERT INTO `site_setting` VALUES (7, 'policeBeian', '联网备案号', '', 1);
+INSERT INTO `site_setting` VALUES (8, 'homeHeaderImage', '首页首屏背景图', '/img/header/hitokoto-bg.jpg.jpeg', 1);
+INSERT INTO `site_setting` VALUES (9, 'reward', '赞赏码', '/img/reward.jpg', 1);
+INSERT INTO `site_setting` VALUES (10, 'commentAdminFlag', '博主评论标识', '咕咕', 1);
+INSERT INTO `site_setting` VALUES (11, 'playlistServer', '播放器平台', 'netease', 1);
+INSERT INTO `site_setting` VALUES (12, 'playlistId', '播放器歌单', '3071528549', 1);
+INSERT INTO `site_setting` VALUES (13, 'avatar', '头像', '/img/avatar.jpg', 2);
+INSERT INTO `site_setting` VALUES (14, 'name', '昵称', 'Naccl', 2);
+INSERT INTO `site_setting` VALUES (15, 'rollText', '滚动个签', '\"云鹤当归天，天不迎我妙木仙；\",\"游龙当归海，海不迎我自来也。\"', 2);
+INSERT INTO `site_setting` VALUES (16, 'github', 'GitHub', 'https://github.com/Naccl', 2);
+INSERT INTO `site_setting` VALUES (17, 'telegram', 'Telegram', 'https://t.me/NacclOfficial', 2);
+INSERT INTO `site_setting` VALUES (18, 'qq', 'QQ', 'http://sighttp.qq.com/authd?IDKEY=', 2);
+INSERT INTO `site_setting` VALUES (19, 'bilibili', 'bilibili', 'https://space.bilibili.com/', 2);
+INSERT INTO `site_setting` VALUES (20, 'netease', '网易云音乐', 'https://music.163.com/#/user/home?id=', 2);
+INSERT INTO `site_setting` VALUES (21, 'email', 'email', 'mailto:you@example.com', 2);
+INSERT INTO `site_setting` VALUES (22, 'favorite', '自定义', '{\"title\":\"最喜欢的动漫 📺\",\"content\":\"异度侵入、春物语、NO GAME NO LIFE、实力至上主义的教室、辉夜大小姐、青春猪头少年不会梦到兔女郎学姐、路人女主、Re0、魔禁、超炮、俺妹、在下坂本、散华礼弥、OVERLORD、慎勇、人渣的本愿、白色相簿2、死亡笔记、DARLING in the FRANXX、鬼灭之刃\"}', 2);
+INSERT INTO `site_setting` VALUES (23, 'favorite', '自定义', '{\"title\":\"最喜欢我的女孩子们 🤤\",\"content\":\"芙兰达、土间埋、食蜂操祈、佐天泪爷、樱岛麻衣、桐崎千棘、02、亚丝娜、高坂桐乃、五更琉璃、安乐冈花火、一色彩羽、英梨梨、珈百璃、时崎狂三、可儿那由多、和泉纱雾、早坂爱\"}', 2);
+INSERT INTO `site_setting` VALUES (24, 'favorite', '自定义', '{\"title\":\"最喜欢玩的游戏 🎮\",\"content\":\"Stellaris、巫师、GTA、荒野大镖客、刺客信条、魔兽争霸、LOL、PUBG\"}', 2);
+INSERT INTO `site_setting` VALUES (25, 'badge', '徽标', '{\"title\":\"本博客已开源于 GitHub\",\"url\":\"https://github.com/Naccl/NBlog\",\"subject\":\"NBlog\",\"value\":\"Open Source\",\"color\":\"brightgreen\"}', 3);
+INSERT INTO `site_setting` VALUES (26, 'badge', '徽标', '{\"title\":\"由 Spring Boot 强力驱动\",\"url\":\"https://spring.io/projects/spring-boot/\",\"subject\":\"Powered\",\"value\":\"Spring Boot\",\"color\":\"blue\"}', 3);
+INSERT INTO `site_setting` VALUES (27, 'badge', '徽标', '{\"title\":\"Vue.js 客户端渲染\",\"url\":\"https://cn.vuejs.org/\",\"subject\":\"SPA\",\"value\":\"Vue.js\",\"color\":\"brightgreen\"}', 3);
+INSERT INTO `site_setting` VALUES (28, 'badge', '徽标', '{\"title\":\"UI 框架 Semantic-UI\",\"url\":\"https://semantic-ui.com/\",\"subject\":\"UI\",\"value\":\"Semantic-UI\",\"color\":\"semantic-ui\"}', 3);
+INSERT INTO `site_setting` VALUES (29, 'badge', '徽标', '{\"title\":\"阿里云提供服务器及域名相关服务\",\"url\":\"https://www.aliyun.com/\",\"subject\":\"VPS & DNS\",\"value\":\"Aliyun\",\"color\":\"blueviolet\"}', 3);
+INSERT INTO `site_setting` VALUES (30, 'badge', '徽标', '{\"title\":\"静态资源托管于 GitHub\",\"url\":\"https://github.com/\",\"subject\":\"OSS\",\"value\":\"GitHub\",\"color\":\"github\"}', 3);
+INSERT INTO `site_setting` VALUES (31, 'badge', '徽标', '{\"title\":\"jsDelivr 加速静态资源\",\"url\":\"https://www.jsdelivr.com/\",\"subject\":\"CDN\",\"value\":\"jsDelivr\",\"color\":\"orange\"}', 3);
+INSERT INTO `site_setting` VALUES (32, 'badge', '徽标', '{\"color\":\"lightgray\",\"subject\":\"CC\",\"title\":\"本站点采用 CC BY 4.0 国际许可协议进行许可\",\"url\":\"https://creativecommons.org/licenses/by/4.0/\",\"value\":\"BY 4.0\"}', 3);
+INSERT INTO `site_setting` VALUES (33, 'friendContent', '友链页面信息', '随机排序，不分先后。欢迎交换友链~(￣▽￣)~*\n\n* 昵称：Naccl\n* 一句话：游龙当归海，海不迎我自来也。\n* 网址：[https://naccl.top](https://naccl.top)\n* 头像URL：[https://naccl.top/img/avatar.jpg](https://naccl.top/img/avatar.jpg)\n\n仅凭个人喜好添加友链，请在收到我的回复邮件后再于贵站添加本站链接。原则上已添加的友链不会删除，如果你发现自己被移除了，恕不另行通知，只需和我一样做就好。\n\n', 4);
+INSERT INTO `site_setting` VALUES (34, 'friendCommentEnabled', '友链页面评论开关', '1', 4);
 
 -- ----------------------------
 -- Table structure for tag
