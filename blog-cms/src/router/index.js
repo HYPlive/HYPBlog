@@ -102,6 +102,12 @@ const routes = [
 				meta: {title: '标签管理', icon: 'biaoqian'}
 			},
 			{
+				path: 'todo/list',
+				name: 'TodoList',
+				component: () => import('@/views/blog/todo/TodoBoard'),
+				meta: {title: 'Todo管理', icon: 'el-icon-finished'}
+			},
+			{
 				path: 'comment/list',
 				name: 'CommentList',
 				component: () => import('@/views/blog/comment/CommentList'),
