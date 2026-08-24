@@ -47,7 +47,7 @@ blog-view/dist/
 log/
 
 ### Upload ###
-upload/
+/upload/
 
 ### Deployment secrets ###
 deploy/compose/.env
