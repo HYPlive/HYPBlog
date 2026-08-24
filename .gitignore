@@ -44,7 +44,7 @@ blog-cms/dist/
 blog-view/dist/
 
 ### Logs ###
-log/
+/log/
 
 ### Upload ###
 /upload/
