@@ -44,7 +44,13 @@ blog-cms/dist/
 blog-view/dist/
 
 ### Logs ###
-log/
+/log/
 
 ### Upload ###
-upload/
+/upload/
+
+### Deployment secrets ###
+deploy/compose/.env
+deploy/compose/api.env
+deploy/compose/mysql.env
+deploy/compose/application-prod.properties

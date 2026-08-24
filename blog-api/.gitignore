@@ -36,3 +36,4 @@ log
 application-test.properties
 application-dev.properties
 application-prod.properties
+!src/test/resources/application-test.properties

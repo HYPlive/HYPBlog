@@ -1,0 +1,22 @@
+# 此文件部署到 /opt/hypblog/config/application-prod.properties，不能提交真实密钥。
+server.port=8090
+blog.name=HYP's Blog
+blog.api=https://your-domain.example/blog
+blog.cms=https://your-domain.example/admin
+blog.view=https://your-domain.example
+token.secretKey=replace-with-a-long-random-value
+logging.file.name=/opt/hypblog/log/blog-api.log
+upload.channel=local
+upload.file.path=/home/ubuntu/hypblog/upload/
+upload.file.access-path=/image/**
+upload.file.resources-locations=file:${upload.file.path}
+
+# 使用邮箱通知时填写真实 SMTP 参数；否则改用 Telegram 或关闭通知。
+comment.notify.channel=mail
+spring.mail.host=smtp.example.com
+spring.mail.port=465
+spring.mail.username=your-email@example.com
+spring.mail.password=replace-with-mail-app-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.ssl.enable=true
+spring.mail.default-encoding=UTF-8

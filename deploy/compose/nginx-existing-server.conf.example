@@ -1,0 +1,26 @@
+# 在现有 Nginx 配置中，仅替换对应 location 的 proxy_pass 上游地址。
+# 保留你已有的 listen、server_name、SSL 证书、日志及其他 location。
+# Compose 只监听 127.0.0.1 的高位端口，现有 Nginx 继续占用 80/443。
+
+# api.hyptest.cn 的 server 块
+location /blog/ {
+    proxy_pass http://127.0.0.1:18090/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+# admin.hyptest.cn 的 server 块
+location / {
+    proxy_pass http://127.0.0.1:18079/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}
+
+# hyptest.cn 的 server 块
+location / {
+    proxy_pass http://127.0.0.1:18080/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}
