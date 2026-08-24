@@ -7,8 +7,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import top.hyp.config.properties.ProxyProperties;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
+import org.springframework.util.StringUtils;
 
 /**
  * RestTemplate相关的Bean配置
@@ -38,10 +37,19 @@ public class RestTemplateConfig {
 	 */
 	@Bean
 	public RestTemplate restTemplateByProxy() {
+		if (proxyProperties == null
+				|| !StringUtils.hasText(proxyProperties.getHost())
+				|| proxyProperties.getPort() == null) {
+			return new RestTemplate();
+		}
+
 		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-		Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyProperties.getHost(), proxyProperties.getPort()));
-		requestFactory.setProxy(proxy);
-		requestFactory.setConnectTimeout(proxyProperties.getTimeout());
+		requestFactory.setProxy(new java.net.Proxy(
+				java.net.Proxy.Type.HTTP,
+				new java.net.InetSocketAddress(proxyProperties.getHost(), proxyProperties.getPort())));
+		if (proxyProperties.getTimeout() != null) {
+			requestFactory.setConnectTimeout(proxyProperties.getTimeout());
+		}
 		return new RestTemplate(requestFactory);
 	}
 }
