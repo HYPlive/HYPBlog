@@ -48,3 +48,9 @@ log/
 
 ### Upload ###
 upload/
+
+### Deployment secrets ###
+deploy/compose/.env
+deploy/compose/api.env
+deploy/compose/mysql.env
+deploy/compose/application-prod.properties
