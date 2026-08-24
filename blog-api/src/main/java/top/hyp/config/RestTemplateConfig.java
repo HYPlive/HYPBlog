@@ -17,7 +17,7 @@ import org.springframework.util.StringUtils;
  */
 @Configuration
 public class RestTemplateConfig {
-	@Autowired
+	@Autowired(required = false)
 	private ProxyProperties proxyProperties;
 
 	/**
