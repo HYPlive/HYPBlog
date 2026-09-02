@@ -1,13 +1,14 @@
-# 此文件部署到 /opt/hypblog/config/application-prod.properties，不能提交真实密钥。
-server.port=8090
+# 此文件部署到 /home/ubuntu/hypblog-deploy/config/application-prod.properties，不能提交真实密钥。
+server.address=127.0.0.1
+server.port=18090
 blog.name=HYP's Blog
-blog.api=https://your-domain.example/blog
-blog.cms=https://your-domain.example/admin
-blog.view=https://your-domain.example
+blog.api=https://api.hyptest.cn/blog
+blog.cms=https://admin.hyptest.cn
+blog.view=https://hyptest.cn
 token.secretKey=replace-with-a-long-random-value
 logging.file.name=/opt/hypblog/log/blog-api.log
 upload.channel=local
-upload.file.path=/home/ubuntu/hypblog/upload/
+upload.file.path=/opt/hypblog/upload/
 upload.file.access-path=/image/**
 upload.file.resources-locations=file:${upload.file.path}
 

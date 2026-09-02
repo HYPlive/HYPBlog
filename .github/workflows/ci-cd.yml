@@ -93,6 +93,27 @@ jobs:
             VUE_APP_API_BASE_URL=https://api.hyptest.cn/blog/admin
             VUE_APP_PUBLIC_PATH=/
           tags: ${{ env.IMAGE_PREFIX }}/hypblog-cms:${{ github.sha }}
+      - name: Prepare deployment directories
+        if: vars.DEPLOY_ENABLED == 'true'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -eu
+            install -d -m 755 /home/ubuntu/hypblog-deploy/compose /home/ubuntu/hypblog-deploy/data/upload /home/ubuntu/hypblog-deploy/log
+            install -d -m 750 /home/ubuntu/hypblog-deploy/config
+      - name: Sync Compose definition
+        if: vars.DEPLOY_ENABLED == 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: deploy/compose/docker-compose.yml
+          target: /home/ubuntu/hypblog-deploy/compose/
+          strip_components: 2
       - name: Deploy on server
         if: vars.DEPLOY_ENABLED == 'true'
         uses: appleboy/ssh-action@v1.0.3
@@ -101,13 +122,20 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            cd /home/ubuntu/hypblog-cicd
+            set -eu
+            test -f /home/ubuntu/hypblog-deploy/.env
+            test -f /home/ubuntu/hypblog-deploy/config/api.env
+            test -f /home/ubuntu/hypblog-deploy/config/application-prod.properties
+            cd /home/ubuntu/hypblog-deploy/compose
             export GHCR_OWNER='${{ github.repository_owner }}'
             export IMAGE_TAG='${{ github.sha }}'
             echo '${{ secrets.GHCR_READ_TOKEN }}' | docker login ghcr.io -u '${{ github.repository_owner }}' --password-stdin
-            docker compose pull
-            docker compose up -d --remove-orphans
-            curl --fail --retry 10 --retry-connrefused http://127.0.0.1:18080/
-            curl --fail --retry 10 --retry-connrefused http://127.0.0.1:18079/
-            curl --fail --retry 10 --retry-connrefused http://127.0.0.1:18090/site
+            docker compose --env-file /home/ubuntu/hypblog-deploy/.env config --quiet
+            docker compose --env-file /home/ubuntu/hypblog-deploy/.env pull
+            docker compose --env-file /home/ubuntu/hypblog-deploy/.env up -d --remove-orphans
+            if ! curl --fail --retry 10 --retry-connrefused http://127.0.0.1:18080/ || ! curl --fail --retry 10 --retry-connrefused http://127.0.0.1:18079/ || ! curl --fail --retry 10 --retry-connrefused http://127.0.0.1:18090/site; then
+              docker compose --env-file /home/ubuntu/hypblog-deploy/.env ps
+              docker compose --env-file /home/ubuntu/hypblog-deploy/.env logs --tail=100 api view cms
+              exit 1
+            fi
             docker image prune -f

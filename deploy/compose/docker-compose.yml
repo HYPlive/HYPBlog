@@ -1,14 +1,14 @@
 services:
   api:
-    image: ghcr.io/${GHCR_OWNER:?set GHCR_OWNER}/hypblog-api:${IMAGE_TAG:-latest}
+    image: ghcr.io/${GHCR_OWNER:?set GHCR_OWNER}/hypblog-api:${IMAGE_TAG:?set IMAGE_TAG}
     restart: unless-stopped
     network_mode: host
     env_file:
-      - ./api.env
+      - ${API_ENV_PATH:?set API_ENV_PATH}
     volumes:
-      - ${UPLOAD_PATH:-/home/ubuntu/hypblog/upload}:/opt/hypblog/upload
-      - ${LOG_PATH:-/home/ubuntu/hypblog/log}:/opt/hypblog/log
-      - ${API_CONFIG_PATH:-/home/ubuntu/hypblog/config/application-prod.properties}:/config/application-prod.properties:ro
+      - ${UPLOAD_PATH:?set UPLOAD_PATH}:/opt/hypblog/upload
+      - ${LOG_PATH:?set LOG_PATH}:/opt/hypblog/log
+      - ${API_CONFIG_PATH:?set API_CONFIG_PATH}:/config/application-prod.properties:ro
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_ADDITIONAL_LOCATION: optional:file:/config/
@@ -16,14 +16,14 @@ services:
     mem_limit: 700m
 
   view:
-    image: ghcr.io/${GHCR_OWNER:?set GHCR_OWNER}/hypblog-view:${IMAGE_TAG:-latest}
+    image: ghcr.io/${GHCR_OWNER:?set GHCR_OWNER}/hypblog-view:${IMAGE_TAG:?set IMAGE_TAG}
     restart: unless-stopped
     ports:
       - "127.0.0.1:18080:80"
     mem_limit: 128m
 
   cms:
-    image: ghcr.io/${GHCR_OWNER:?set GHCR_OWNER}/hypblog-cms:${IMAGE_TAG:-latest}
+    image: ghcr.io/${GHCR_OWNER:?set GHCR_OWNER}/hypblog-cms:${IMAGE_TAG:?set IMAGE_TAG}
     restart: unless-stopped
     ports:
       - "127.0.0.1:18079:80"
