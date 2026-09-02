@@ -11,7 +11,6 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
 
 jobs:
   verify:
@@ -78,13 +77,13 @@ jobs:
         with:
           context: ./blog-api
           push: true
-          tags: ${{ env.IMAGE_PREFIX }}/hypblog-api:${{ github.sha }}
+          tags: ghcr.io/hyplive/hypblog-api:${{ github.sha }}
       - uses: docker/build-push-action@v6
         with:
           context: ./blog-view
           push: true
           build-args: VUE_APP_API_BASE_URL=https://api.hyptest.cn/blog
-          tags: ${{ env.IMAGE_PREFIX }}/hypblog-view:${{ github.sha }}
+          tags: ghcr.io/hyplive/hypblog-view:${{ github.sha }}
       - uses: docker/build-push-action@v6
         with:
           context: ./blog-cms
@@ -92,7 +91,7 @@ jobs:
           build-args: |
             VUE_APP_API_BASE_URL=https://api.hyptest.cn/blog/admin
             VUE_APP_PUBLIC_PATH=/
-          tags: ${{ env.IMAGE_PREFIX }}/hypblog-cms:${{ github.sha }}
+          tags: ghcr.io/hyplive/hypblog-cms:${{ github.sha }}
       - name: Prepare deployment directories
         if: vars.DEPLOY_ENABLED == 'true'
         uses: appleboy/ssh-action@v1.0.3
@@ -127,7 +126,7 @@ jobs:
             test -f /home/ubuntu/hypblog-deploy/config/api.env
             test -f /home/ubuntu/hypblog-deploy/config/application-prod.properties
             cd /home/ubuntu/hypblog-deploy/compose
-            export GHCR_OWNER='${{ github.repository_owner }}'
+            export GHCR_OWNER='hyplive'
             export IMAGE_TAG='${{ github.sha }}'
             echo '${{ secrets.GHCR_READ_TOKEN }}' | docker login ghcr.io -u '${{ github.repository_owner }}' --password-stdin
             docker compose --env-file /home/ubuntu/hypblog-deploy/.env config --quiet

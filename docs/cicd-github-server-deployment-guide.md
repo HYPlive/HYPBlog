@@ -230,7 +230,7 @@ nano /home/ubuntu/hypblog-deploy/.env
 填写：
 
 ```dotenv
-GHCR_OWNER=HYPlive
+GHCR_OWNER=hyplive
 IMAGE_TAG=填写第一个成功发布的完整 commit SHA
 API_ENV_PATH=/home/ubuntu/hypblog-deploy/config/api.env
 UPLOAD_PATH=/home/ubuntu/hypblog-deploy/data/upload
