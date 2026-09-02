@@ -11,7 +11,7 @@ services:
       - ${API_CONFIG_PATH:?set API_CONFIG_PATH}:/config/application-prod.properties:ro
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_CONFIG_ADDITIONAL_LOCATION: optional:file:/config/
+      SPRING_CONFIG_ADDITIONAL_LOCATION: optional:file:/config/application-prod.properties
       JAVA_OPTS: "-Xms256m -Xmx512m"
     mem_limit: 700m
 
