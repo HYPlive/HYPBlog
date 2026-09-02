@@ -24,6 +24,9 @@
 			<router-link to="/friends" class="item" :class="{'m-mobile-hide': mobileHide,'active':$route.name==='friends'}">
 				<i class="users icon"></i>友人帐
 			</router-link>
+			<router-link to="/todos" class="item" :class="{'m-mobile-hide': mobileHide,'active':$route.name==='todos'}">
+				<i class="tasks icon"></i>Todo
+			</router-link>
 			<router-link to="/about" class="item" :class="{'m-mobile-hide': mobileHide,'active':$route.name==='about'}">
 				<i class="info icon"></i>关于我
 			</router-link>
