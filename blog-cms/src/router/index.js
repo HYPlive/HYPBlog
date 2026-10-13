@@ -135,6 +135,12 @@ const routes = [
 				meta: {title: '友链管理', icon: 'friend'}
 			},
 			{
+				path: 'common-website',
+				name: 'CommonWebsiteList',
+				component: () => import('@/views/page/CommonWebsiteList'),
+				meta: {title: '常用网站', icon: 'el-icon-link'}
+			},
+			{
 				path: 'about',
 				name: 'About',
 				component: () => import('@/views/page/About'),

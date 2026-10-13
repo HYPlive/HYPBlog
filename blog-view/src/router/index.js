@@ -67,6 +67,12 @@ const routes = [
 				meta: {title: 'Todo'}
 			},
 			{
+				path: '/websites',
+				name: 'websites',
+				component: () => import('@/views/websites/Websites'),
+				meta: {title: '常用网站'}
+			},
+			{
 				path: '/about',
 				name: 'about',
 				component: () => import('@/views/about/About'),
