@@ -14,6 +14,7 @@
 						<!--左侧-->
 						<div class="three wide column m-mobile-hide">
 							<Introduction :class="{'m-display-none':focusMode}"/>
+							<ContributionCalendar :class="{'m-display-none':focusMode}"/>
 						</div>
 						<!--中间-->
 						<div class="ten wide column">
@@ -55,6 +56,7 @@
 	import Header from "@/components/index/Header";
 	import Footer from "@/components/index/Footer";
 	import Introduction from "@/components/sidebar/Introduction";
+	import ContributionCalendar from "@/components/sidebar/ContributionCalendar";
 	import Tags from "@/components/sidebar/Tags";
 	import RandomBlog from "@/components/sidebar/RandomBlog";
 	import Tocbot from "@/components/sidebar/Tocbot";
@@ -64,7 +66,7 @@
 
 	export default {
 		name: "Index",
-		components: {Header, BlogPasswordDialog, Tocbot, RandomBlog, Tags, Nav, Footer, Introduction},
+		components: {Header, BlogPasswordDialog, Tocbot, RandomBlog, Tags, Nav, Footer, Introduction, ContributionCalendar},
 		data() {
 			return {
 				siteInfo: {

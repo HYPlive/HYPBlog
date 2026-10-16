@@ -2,6 +2,7 @@ package top.hyp.service;
 
 import top.hyp.entity.Blog;
 import top.hyp.model.dto.BlogVisibility;
+import top.hyp.model.vo.BlogContribution;
 import top.hyp.model.vo.BlogDetail;
 import top.hyp.model.vo.BlogInfo;
 import top.hyp.model.vo.NewBlog;
@@ -68,4 +69,6 @@ public interface BlogService {
 	Boolean getCommentEnabledByBlogId(Long blogId);
 
 	Boolean getPublishedByBlogId(Long blogId);
+
+	List<BlogContribution> getBlogContribution();
 }
