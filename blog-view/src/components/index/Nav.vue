@@ -24,6 +24,9 @@
 			<router-link to="/friends" class="item" :class="{'m-mobile-hide': mobileHide,'active':$route.name==='friends'}">
 				<i class="users icon"></i>友人帐
 			</router-link>
+			<router-link to="/websites" class="item" :class="{'m-mobile-hide': mobileHide,'active':$route.name==='websites'}">
+				<i class="linkify icon"></i>常用网站
+			</router-link>
 			<router-link to="/todos" class="item" :class="{'m-mobile-hide': mobileHide,'active':$route.name==='todos'}">
 				<i class="tasks icon"></i>Todo
 			</router-link>
@@ -190,6 +193,8 @@
 	.ui.inverted.pointing.menu .el-dropdown-link {
 		margin: 0 .35em !important;
 		border-radius: 0 !important;
+		white-space: nowrap !important;
+		flex-shrink: 0 !important;
 	}
 
 	.ui.inverted.pointing.menu .item:hover,

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.hyp.mapper.CommonWebsiteMapper">
+    <resultMap id="website" type="top.hyp.entity.CommonWebsite">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="url" column="url"/>
+        <result property="icon" column="icon"/>
+        <result property="color" column="color"/>
+        <result property="published" column="is_published"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <!--查询常用网站List-->
+    <select id="getWebsiteList" resultMap="website">
+        select id, name, description, url, icon, color, is_published, sort, create_time from common_website
+    </select>
+
+    <resultMap id="websiteVO" type="top.hyp.model.vo.CommonWebsite">
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="url" column="url"/>
+        <result property="icon" column="icon"/>
+        <result property="color" column="color"/>
+    </resultMap>
+
+    <!--查询常用网站VO List（仅公开，按排序值升序）-->
+    <select id="getWebsiteVOList" resultMap="websiteVO">
+        select name, description, url, icon, color from common_website where is_published=true order by sort asc, create_time asc
+    </select>
+
+    <!--添加常用网站-->
+    <insert id="saveWebsite" parameterType="top.hyp.entity.CommonWebsite" useGeneratedKeys="true" keyProperty="id">
+        insert into common_website (name, description, url, icon, color, is_published, sort, create_time)
+        values (#{name}, #{description}, #{url}, #{icon}, #{color}, #{published}, #{sort}, #{createTime})
+    </insert>
+
+    <!--更新常用网站-->
+    <update id="updateWebsite">
+        update common_website set name=#{name}, description=#{description}, url=#{url}, icon=#{icon}, color=#{color}, is_published=#{published}, sort=#{sort}
+        where id=#{id}
+    </update>
+
+    <!--按id删除常用网站-->
+    <delete id="deleteWebsite">
+        delete from common_website where id=#{id}
+    </delete>
+
+    <!--更新常用网站公开状态-->
+    <update id="updatePublishedById">
+        update common_website set is_published=#{published} where id=#{id}
+    </update>
+</mapper>

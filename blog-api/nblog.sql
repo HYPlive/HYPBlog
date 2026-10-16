@@ -386,4 +386,28 @@ CREATE TABLE `todo`  (
   INDEX `idx_todo_published_status_sort`(`is_published`, `status`, `sort`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- Table structure for common_website
+-- ----------------------------
+DROP TABLE IF EXISTS `common_website`;
+CREATE TABLE `common_website`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '网站名称',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '网站介绍',
+  `url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '网址',
+  `icon` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '图标(图片URL或emoji)',
+  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '主题色',
+  `is_published` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否公开',
+  `sort` int(0) NOT NULL DEFAULT 0 COMMENT '排序值',
+  `create_time` datetime(0) NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of common_website
+-- ----------------------------
+INSERT INTO `common_website` VALUES (1, 'GitHub', '代码托管平台', 'https://github.com', '🐙', '#24292e', b'1', 1, NOW());
+INSERT INTO `common_website` VALUES (2, 'MDN Web Docs', 'Web 开发文档', 'https://developer.mozilla.org', '📚', '#1b1f23', b'1', 2, NOW());
+INSERT INTO `common_website` VALUES (3, 'Google', '搜索引擎', 'https://www.google.com', '🔍', '#4285f4', b'1', 3, NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;
