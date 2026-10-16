@@ -325,4 +325,18 @@
     <select id="getCategoryBlogCountList" resultMap="categoryBlogCount">
         select category_id, count(category_id) as blog_count from blog where status='FINISHED' group by category_id
     </select>
+
+    <resultMap id="blogContribution" type="top.hyp.model.vo.BlogContribution">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="date" column="date"/>
+    </resultMap>
+
+    <!--查询最近365天已发布文章的提交日历数据-->
+    <select id="getBlogContribution" resultMap="blogContribution">
+        select id, title, date_format(create_time, '%Y-%m-%d') as date
+        from blog
+        where is_published=true and status='FINISHED' and create_time >= date_sub(curdate(), interval 365 day)
+        order by create_time asc
+    </select>
 </mapper>

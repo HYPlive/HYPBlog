@@ -32,3 +32,10 @@ export function getSearchBlogList(query) {
 		}
 	})
 }
+
+export function getContribution() {
+	return axios({
+		url: 'contribution',
+		method: 'GET'
+	})
+}

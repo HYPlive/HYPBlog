@@ -14,6 +14,7 @@ import top.hyp.mapper.BlogMapper;
 import top.hyp.model.dto.BlogView;
 import top.hyp.model.dto.BlogVisibility;
 import top.hyp.model.vo.ArchiveBlog;
+import top.hyp.model.vo.BlogContribution;
 import top.hyp.model.vo.BlogDetail;
 import top.hyp.model.vo.BlogInfo;
 import top.hyp.model.vo.NewBlog;
@@ -397,6 +398,11 @@ public class BlogServiceImpl implements BlogService {
 	@Override
 	public Boolean getPublishedByBlogId(Long blogId) {
 		return blogMapper.getPublishedByBlogId(blogId);
+	}
+
+	@Override
+	public List<BlogContribution> getBlogContribution() {
+		return blogMapper.getBlogContribution();
 	}
 
 	/**

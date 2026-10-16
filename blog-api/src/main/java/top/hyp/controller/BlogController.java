@@ -12,6 +12,7 @@ import top.hyp.constant.JwtConstants;
 import top.hyp.entity.User;
 import top.hyp.enums.VisitBehavior;
 import top.hyp.model.dto.BlogPassword;
+import top.hyp.model.vo.BlogContribution;
 import top.hyp.model.vo.BlogDetail;
 import top.hyp.model.vo.BlogInfo;
 import top.hyp.model.vo.PageResult;
@@ -47,6 +48,16 @@ public class BlogController {
 	public Result blogs(@RequestParam(defaultValue = "1") Integer pageNum) {
 		PageResult<BlogInfo> pageResult = blogService.getBlogInfoListByIsPublished(pageNum);
 		return Result.ok("请求成功", pageResult);
+	}
+
+	/**
+	 * 获取最近365天的文章提交日历数据
+	 */
+	@VisitLogger(VisitBehavior.UNKNOWN)
+	@GetMapping("/contribution")
+	public Result contribution() {
+		List<BlogContribution> contributionList = blogService.getBlogContribution();
+		return Result.ok("获取成功", contributionList);
 	}
 
 	/**
