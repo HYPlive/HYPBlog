@@ -42,6 +42,14 @@ request.interceptors.response.use(response => {
 		if (res.code !== 200) {
 			let msg = res.msg || 'Error'
 			Message.error(msg)
+			if (res.code === 403) {
+				// 凭证失效，先展示提示，稍后清除本地登录信息并跳转登录页
+				setTimeout(() => {
+					window.localStorage.removeItem('token')
+					window.localStorage.removeItem('user')
+					window.location.href = process.env.BASE_URL + 'login'
+				}, 1500)
+			}
 			return Promise.reject(new Error(msg))
 		}
 		return res
