@@ -28,7 +28,7 @@ CREATE TABLE `todo`  (
   `priority` tinyint NOT NULL DEFAULT 1 COMMENT '优先级星级，1到5',
   `sort` int NOT NULL DEFAULT 0 COMMENT '同状态下排序值',
   `is_published` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否公开',
-  `discovered_time` datetime NOT NULL COMMENT '发现时间',
+  `discovered_time` datetime NOT NULL COMMENT '创建时间',
   `completed_time` datetime NULL DEFAULT NULL COMMENT '完成时间',
   `update_time` datetime NOT NULL COMMENT '最后更新时间',
   PRIMARY KEY (`id`) USING BTREE,
