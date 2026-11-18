@@ -9,11 +9,13 @@ import org.commonmark.ext.task.list.items.TaskListItemsExtension;
 import org.commonmark.node.Image;
 import org.commonmark.node.Link;
 import org.commonmark.node.Node;
+import org.commonmark.node.Paragraph;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.AttributeProvider;
 import org.commonmark.renderer.html.AttributeProviderContext;
 import org.commonmark.renderer.html.AttributeProviderFactory;
 import org.commonmark.renderer.html.HtmlRenderer;
+import org.commonmark.renderer.text.TextContentRenderer;
 import top.hyp.util.markdown.ext.heimu.HeimuExtension;
 import top.hyp.util.markdown.ext.cover.CoverExtension;
 
@@ -22,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Description: Markdown转换
@@ -57,6 +61,7 @@ public class MarkdownUtils {
 			.extensions(delExtension)
 			.extensions(heimuExtension)
 			.extensions(coverExtension)
+			.softbreak("<br>\n")
 			.attributeProviderFactory(new AttributeProviderFactory() {
 				@Override
 				public AttributeProvider create(AttributeProviderContext context) {
@@ -112,6 +117,63 @@ public class MarkdownUtils {
 	public static String markdownToHtmlExtensions(String markdown) {
 		Node document = parser.parse(markdown);
 		return renderer.render(document);
+	}
+
+	/**
+	 * 从 Markdown 正文生成文章描述：取第一个正文段落，并在句末标点处截断，避免生硬切断
+	 */
+	public static String markdownToDescription(String markdown, int maxLen) {
+		if (markdown == null || "".equals(markdown.trim())) {
+			return "";
+		}
+		Parser plainParser = Parser.builder().build();
+		Node document = plainParser.parse(markdown);
+		TextContentRenderer textRenderer = TextContentRenderer.builder().build();
+		Node node = document.getFirstChild();
+		while (node != null) {
+			if (node instanceof Paragraph) {
+				String text = textRenderer.render(node).replaceAll("\\s+", " ").trim();
+				if (!"".equals(text)) {
+					return truncateAtSentence(text, maxLen);
+				}
+			}
+			node = node.getNext();
+		}
+		return "";
+	}
+
+	private static String truncateAtSentence(String text, int maxLen) {
+		if (text.length() <= maxLen) {
+			return text;
+		}
+		String sub = text.substring(0, maxLen);
+		String punctuation = "。！？!?.;；";
+		int cut = -1;
+		for (int i = sub.length() - 1; i >= 0; i--) {
+			if (punctuation.indexOf(sub.charAt(i)) >= 0) {
+				cut = i;
+				break;
+			}
+		}
+		return (cut >= 0 ? sub.substring(0, cut + 1) : sub) + "…";
+	}
+
+	/**
+	 * 从 Markdown 正文提取第一张图片地址，没有则返回空字符串
+	 */
+	public static String markdownToFirstImage(String markdown) {
+		if (markdown == null || "".equals(markdown)) {
+			return "";
+		}
+		Matcher m = Pattern.compile("!\\[[^\\]]*\\]\\(([^)\\s]+)\\)").matcher(markdown);
+		if (m.find()) {
+			return m.group(1);
+		}
+		m = Pattern.compile("<img[^>]+src=[\"']([^\"']+)[\"']").matcher(markdown);
+		if (m.find()) {
+			return m.group(1);
+		}
+		return "";
 	}
 
 	public static void main(String[] args) {

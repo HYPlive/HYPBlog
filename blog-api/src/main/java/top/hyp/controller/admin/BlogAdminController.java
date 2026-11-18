@@ -24,6 +24,7 @@ import top.hyp.service.CategoryService;
 import top.hyp.service.CommentService;
 import top.hyp.service.TagService;
 import top.hyp.util.StringUtils;
+import top.hyp.util.markdown.MarkdownUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +40,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin")
 public class BlogAdminController {
+	private static final String DEFAULT_FIRST_PICTURE = "https://hyptest.cn/img/1.jpg";
+
 	@Autowired
 	BlogService blogService;
 	@Autowired
@@ -189,9 +192,20 @@ public class BlogAdminController {
 	 */
 	private Result getResult(top.hyp.model.dto.Blog blog, String type) {
 		//验证普通字段
-		if (StringUtils.isEmpty(blog.getTitle(), blog.getFirstPicture(), blog.getContent(), blog.getDescription())
+		if (StringUtils.isEmpty(blog.getTitle(), blog.getContent())
 				|| blog.getWords() == null || blog.getWords() < 0) {
 			return Result.error("参数有误");
+		}
+
+		//描述为空时，取第一个正文段落作为描述
+		if (StringUtils.isEmpty(blog.getDescription())) {
+			blog.setDescription(MarkdownUtils.markdownToDescription(blog.getContent(), 200));
+		}
+
+		//首图为空时，取正文第一张图片，没有则用默认图
+		if (StringUtils.isEmpty(blog.getFirstPicture())) {
+			String firstImage = MarkdownUtils.markdownToFirstImage(blog.getContent());
+			blog.setFirstPicture(StringUtils.isEmpty(firstImage) ? DEFAULT_FIRST_PICTURE : firstImage);
 		}
 
 		//处理分类
