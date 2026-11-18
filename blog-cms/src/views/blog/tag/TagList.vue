@@ -13,7 +13,7 @@
 			<el-table-column label="颜色">
 				<template v-slot="scope">
 					<span style="float:left;width: 100px;">{{ scope.row.color }}</span>
-					<span style="float:left;width: 100px; height: 23px" :class="`me-${scope.row.color}`"></span>
+					<span style="float:left;width: 100px; height: 23px" :style="{background: scope.row.color}"></span>
 				</template>
 			</el-table-column>
 			<el-table-column label="操作">
@@ -40,13 +40,7 @@
 					<el-input v-model="addForm.name"></el-input>
 				</el-form-item>
 				<el-form-item label="标签颜色">
-					<el-select v-model="addForm.color" placeholder="请选择颜色" :clearable="true" style="width: 100%">
-						<el-option v-for="item in colors" :key="item.value" :label="item.label" :value="item.value">
-							<span style="float: left; width: 100px;">{{ item.label }}</span>
-							<span style="float: left; width: 100px; height: inherit" :class="`me-${item.value}`"></span>
-							<span style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
-						</el-option>
-					</el-select>
+					<el-color-picker v-model="addForm.color" :predefine="predefineColors"></el-color-picker>
 				</el-form-item>
 			</el-form>
 			<!--底部-->
@@ -64,13 +58,7 @@
 					<el-input v-model="editForm.name"></el-input>
 				</el-form-item>
 				<el-form-item label="标签颜色" prop="color">
-					<el-select v-model="editForm.color" placeholder="请选择颜色" :clearable="true" style="width: 100%">
-						<el-option v-for="item in colors" :key="item.value" :label="item.label" :value="item.value">
-							<span style="float: left; width: 100px;">{{ item.label }}</span>
-							<span style="float: left; width: 100px; height: inherit" :class="`me-${item.value}`"></span>
-							<span style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
-						</el-option>
-					</el-select>
+					<el-color-picker v-model="editForm.color" :predefine="predefineColors"></el-color-picker>
 				</el-form-item>
 			</el-form>
 			<!--底部-->
@@ -109,21 +97,12 @@
 				formRules: {
 					name: [{required: true, message: '请输入标签名称', trigger: 'blur'}]
 				},
-				colors: [
-					{label: '红色', value: 'red'},
-					{label: '橘黄', value: 'orange'},
-					{label: '黄色', value: 'yellow'},
-					{label: '橄榄绿', value: 'olive'},
-					{label: '纯绿', value: 'green'},
-					{label: '水鸭蓝', value: 'teal'},
-					{label: '纯蓝', value: 'blue'},
-					{label: '紫罗兰', value: 'violet'},
-					{label: '紫色', value: 'purple'},
-					{label: '粉红', value: 'pink'},
-					{label: '棕色', value: 'brown'},
-					{label: '灰色', value: 'grey'},
-					{label: '黑色', value: 'black'},
-				],
+				colorNames: {
+					red: '#DD3C3C', orange: '#F27E31', yellow: '#FAC21F', olive: '#BBCF2D',
+					green: '#36BF56', teal: '#18BBB3', blue: '#368FD3', violet: '#7248CD',
+					purple: '#AB46CC', pink: '#E14BA0', brown: '#AC7551', grey: '#828282', black: '#303132'
+				},
+				predefineColors: ['#DD3C3C', '#F27E31', '#FAC21F', '#BBCF2D', '#36BF56', '#18BBB3', '#368FD3', '#7248CD', '#AB46CC', '#E14BA0', '#AC7551', '#828282', '#303132'],
 			}
 		},
 		created() {
@@ -178,7 +157,12 @@
 			},
 			showEditDialog(row) {
 				this.editForm = {...row}
+				this.editForm.color = this.toHex(this.editForm.color)
 				this.editDialogVisible = true
+			},
+			toHex(color) {
+				if (!color) return color
+				return color.startsWith('#') ? color : (this.colorNames[color] || color)
 			},
 			deleteTagById(id) {
 				deleteTagById(id).then(res => {
