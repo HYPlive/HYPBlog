@@ -7,7 +7,7 @@
 		<div v-if="websiteList.length" class="website-grid">
 			<a v-for="(item, index) in websiteList" :key="index" :href="item.url" target="_blank" rel="external nofollow noopener"
 			   class="website-card" :style="{'--accent': item.color || '#48dbfb'}">
-				<div class="website-icon">
+				<div class="website-icon" :class="{ 'is-default': !item.icon }">
 					<img v-if="isImageUrl(item.icon)" :src="item.icon" alt="">
 					<span v-else-if="item.icon">{{ item.icon }}</span>
 					<i v-else class="linkify icon"></i>
@@ -90,11 +90,11 @@
 		width: 44px;
 		height: 44px;
 		border-radius: 10px;
-		background: var(--accent);
+		background: #f4f6f8;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #fff;
+		color: #606266;
 		font-size: 22px;
 		line-height: 1;
 	}
@@ -104,6 +104,11 @@
 		height: 26px;
 		border-radius: 4px;
 		object-fit: contain;
+	}
+
+	.website-icon.is-default {
+		background: var(--accent);
+		color: #fff;
 	}
 
 	.website-icon .icon {

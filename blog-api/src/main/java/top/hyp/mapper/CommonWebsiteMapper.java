@@ -1,6 +1,7 @@
 package top.hyp.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import top.hyp.entity.CommonWebsite;
 
@@ -25,4 +26,8 @@ public interface CommonWebsiteMapper {
 	int deleteWebsite(Long id);
 
 	int updatePublishedById(Long id, Boolean published);
+
+	int updateSortById(@Param("id") Long id, @Param("sort") Integer sort);
+
+	Integer getMaxSort();
 }

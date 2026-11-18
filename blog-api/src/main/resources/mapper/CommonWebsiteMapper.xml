@@ -15,7 +15,7 @@
 
     <!--查询常用网站List-->
     <select id="getWebsiteList" resultMap="website">
-        select id, name, description, url, icon, color, is_published, sort, create_time from common_website
+        select id, name, description, url, icon, color, is_published, sort, create_time from common_website order by sort asc, create_time asc
     </select>
 
     <resultMap id="websiteVO" type="top.hyp.model.vo.CommonWebsite">
@@ -52,4 +52,14 @@
     <update id="updatePublishedById">
         update common_website set is_published=#{published} where id=#{id}
     </update>
+
+    <!--更新排序值-->
+    <update id="updateSortById">
+        update common_website set sort=#{sort} where id=#{id}
+    </update>
+
+    <!--查询最大排序值-->
+    <select id="getMaxSort" resultType="java.lang.Integer">
+        select max(sort) from common_website
+    </select>
 </mapper>

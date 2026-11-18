@@ -35,7 +35,8 @@ public class CommonWebsiteServiceImpl implements CommonWebsiteService {
 	@Override
 	public void saveWebsite(CommonWebsite website) {
 		website.setPublished(website.getPublished() == null || website.getPublished());
-		website.setSort(website.getSort() == null ? 0 : website.getSort());
+		Integer maxSort = commonWebsiteMapper.getMaxSort();
+		website.setSort(maxSort == null ? 0 : maxSort + 1);
 		website.setCreateTime(new Date());
 		if (commonWebsiteMapper.saveWebsite(website) != 1) {
 			throw new PersistenceException("添加失败");
@@ -63,6 +64,16 @@ public class CommonWebsiteServiceImpl implements CommonWebsiteService {
 	public void updatePublishedById(Long id, Boolean published) {
 		if (commonWebsiteMapper.updatePublishedById(id, published) != 1) {
 			throw new PersistenceException("操作失败");
+		}
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void updateSort(List<Long> ids) {
+		for (int i = 0; i < ids.size(); i++) {
+			if (commonWebsiteMapper.updateSortById(ids.get(i), i) != 1) {
+				throw new PersistenceException("排序更新失败");
+			}
 		}
 	}
 }

@@ -7,11 +7,11 @@
 			</el-form-item>
 		</el-form>
 
-		<el-table :data="websiteList">
+		<el-table :data="websiteList" row-key="id" ref="websiteTable">
 			<el-table-column label="序号" type="index" width="50"></el-table-column>
 			<el-table-column label="图标" width="70">
 				<template v-slot="scope">
-					<span class="icon-badge" :style="{background: scope.row.color || '#48dbfb'}">
+					<span class="icon-badge" :class="{ 'is-default': !scope.row.icon }" :style="!scope.row.icon ? { background: scope.row.color || '#48dbfb' } : null">
 						<img v-if="isImageUrl(scope.row.icon)" :src="scope.row.icon" alt="">
 						<span v-else-if="scope.row.icon">{{ scope.row.icon }}</span>
 						<i v-else class="el-icon-link"></i>
@@ -27,7 +27,6 @@
 					<span v-else>默认</span>
 				</template>
 			</el-table-column>
-			<el-table-column label="排序" prop="sort" width="70"></el-table-column>
 			<el-table-column label="是否公开" width="100">
 				<template v-slot="scope">
 					<el-switch v-model="scope.row.published" @change="publishedChanged(scope.row)"></el-switch>
@@ -41,13 +40,12 @@
 					</el-popconfirm>
 				</template>
 			</el-table-column>
+			<el-table-column label="拖动排序" width="80" align="center">
+				<template v-slot="scope">
+					<i class="el-icon-menu drag-handle"></i>
+				</template>
+			</el-table-column>
 		</el-table>
-
-		<!--分页-->
-		<el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pageNum"
-		               :page-sizes="[10, 20, 30, 50]" :page-size="queryInfo.pageSize" :total="total"
-		               layout="total, sizes, prev, pager, next, jumper" background>
-		</el-pagination>
 
 		<!--添加网站对话框-->
 		<el-dialog title="添加网站" width="40%" :visible.sync="addDialogVisible" :close-on-click-modal="false" @close="addDialogClosed">
@@ -66,9 +64,6 @@
 				</el-form-item>
 				<el-form-item label="主题色" prop="color">
 					<el-color-picker v-model="addForm.color"></el-color-picker>
-				</el-form-item>
-				<el-form-item label="排序" prop="sort">
-					<el-input-number v-model="addForm.sort" :min="0" :max="9999"></el-input-number>
 				</el-form-item>
 				<el-form-item label="是否公开" prop="published">
 					<el-switch v-model="addForm.published"></el-switch>
@@ -98,9 +93,6 @@
 				<el-form-item label="主题色" prop="color">
 					<el-color-picker v-model="editForm.color"></el-color-picker>
 				</el-form-item>
-				<el-form-item label="排序" prop="sort">
-					<el-input-number v-model="editForm.sort" :min="0" :max="9999"></el-input-number>
-				</el-form-item>
 				<el-form-item label="是否公开" prop="published">
 					<el-switch v-model="editForm.published"></el-switch>
 				</el-form-item>
@@ -115,19 +107,15 @@
 
 <script>
 	import Breadcrumb from "@/components/Breadcrumb";
-	import {getWebsitesByQuery, updatePublished, saveWebsite, updateWebsite, deleteWebsiteById} from "@/api/commonWebsite";
+	import Sortable from "sortablejs";
+	import {getWebsites, updatePublished, saveWebsite, updateWebsite, deleteWebsiteById, updateSort} from "@/api/commonWebsite";
 
 	export default {
 		name: "CommonWebsiteList",
 		components: {Breadcrumb},
 		data() {
 			return {
-				queryInfo: {
-					pageNum: 1,
-					pageSize: 10
-				},
 				websiteList: [],
-				total: 0,
 				addDialogVisible: false,
 				editDialogVisible: false,
 				addForm: {
@@ -136,8 +124,7 @@
 					url: '',
 					icon: '',
 					color: '',
-					published: true,
-					sort: 0
+					published: true
 				},
 				editForm: {
 					name: '',
@@ -145,8 +132,7 @@
 					url: '',
 					icon: '',
 					color: '',
-					published: true,
-					sort: 0
+					published: true
 				},
 				formRules: {
 					name: [{required: true, message: '请输入名称', trigger: 'blur'}],
@@ -157,23 +143,39 @@
 		created() {
 			this.getWebsiteList()
 		},
+		beforeDestroy() {
+			if (this.sortable) this.sortable.destroy()
+		},
 		methods: {
 			isImageUrl(icon) {
 				return icon && (icon.startsWith('http') || icon.startsWith('/'))
 			},
 			getWebsiteList() {
-				getWebsitesByQuery(this.queryInfo).then(res => {
-					this.websiteList = res.data.list
-					this.total = res.data.total
+				getWebsites().then(res => {
+					this.websiteList = res.data
+					this.$nextTick(() => this.initSortable())
 				})
 			},
-			handleSizeChange(newSize) {
-				this.queryInfo.pageSize = newSize
-				this.getWebsiteList()
+			initSortable() {
+				if (this.sortable) this.sortable.destroy()
+				const tbody = this.$refs.websiteTable.$el.querySelector('.el-table__body-wrapper tbody')
+				if (!tbody) return
+				this.sortable = Sortable.create(tbody, {
+					handle: '.drag-handle',
+					animation: 150,
+					onEnd: ({oldIndex, newIndex}) => this.handleDragEnd(oldIndex, newIndex)
+				})
 			},
-			handleCurrentChange(newPage) {
-				this.queryInfo.pageNum = newPage
-				this.getWebsiteList()
+			handleDragEnd(oldIndex, newIndex) {
+				if (oldIndex === newIndex) return
+				const moved = this.websiteList.splice(oldIndex, 1)[0]
+				this.websiteList.splice(newIndex, 0, moved)
+				updateSort(this.websiteList.map(w => w.id)).then(res => {
+					this.msgSuccess(res.msg)
+				}).catch(() => {
+					this.msgError('排序更新失败')
+					this.getWebsiteList()
+				})
 			},
 			publishedChanged(row) {
 				updatePublished(row.id, row.published).then(res => {
@@ -224,6 +226,10 @@
 </script>
 
 <style scoped>
+	.drag-handle {
+		cursor: move;
+	}
+
 	.icon-badge {
 		display: inline-flex;
 		align-items: center;
@@ -231,8 +237,13 @@
 		width: 32px;
 		height: 32px;
 		border-radius: 8px;
-		color: #fff;
+		background: #f4f6f8;
+		color: #606266;
 		font-size: 16px;
+	}
+
+	.icon-badge.is-default {
+		color: #fff;
 	}
 
 	.icon-badge img {

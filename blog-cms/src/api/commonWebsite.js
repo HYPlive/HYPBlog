@@ -1,12 +1,9 @@
 import axios from '@/util/request'
 
-export function getWebsitesByQuery(queryInfo) {
+export function getWebsites() {
 	return axios({
 		url: 'websites',
-		method: 'GET',
-		params: {
-			...queryInfo
-		}
+		method: 'GET'
 	})
 }
 
@@ -48,5 +45,13 @@ export function deleteWebsiteById(id) {
 		params: {
 			id
 		}
+	})
+}
+
+export function updateSort(ids) {
+	return axios({
+		url: 'website/sort',
+		method: 'PUT',
+		data: ids
 	})
 }
