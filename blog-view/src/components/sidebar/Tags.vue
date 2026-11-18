@@ -3,7 +3,7 @@
 	<div class="ui segments m-box">
 		<div class="ui secondary segment"><i class="tags icon"></i>标签云</div>
 		<div class="ui yellow segment m-padding-small">
-			<router-link :to="`/tag/${tag.name}`" class="ui label m-text-500" :class="tag.color" v-for="(tag,index) in tagList" :key="index">
+			<router-link :to="`/tag/${tag.name}`" class="ui label m-text-500" :style="tag.color ? { background: tag.color, borderColor: tag.color, color: '#fff' } : null" v-for="(tag,index) in tagList" :key="index">
 				{{ tag.name }}
 			</router-link>
 		</div>
