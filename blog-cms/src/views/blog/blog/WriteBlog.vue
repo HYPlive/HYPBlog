@@ -42,7 +42,7 @@
 			<el-row :gutter="20">
 				<el-col :span="8">
 					<el-form-item label="字数" prop="words">
-						<el-input v-model="form.words" placeholder="请输入文章字数（自动计算阅读时长）" type="number"></el-input>
+						<el-input v-model="form.words" placeholder="自动计算" type="number" disabled></el-input>
 					</el-form-item>
 				</el-col>
 				<el-col :span="8">
@@ -108,6 +108,8 @@
 	import {getCategoryAndTag, saveBlog, getBlogById, updateBlog} from '@/api/blog'
 	import {saveDraft, getDraftById, updateDraft} from '@/api/draft'
 
+	const DEFAULT_FIRST_PICTURE = 'https://hyptest.cn/img/1.jpg'
+
 	export default {
 		name: "WriteBlog",
 		components: {Breadcrumb},
@@ -119,7 +121,7 @@
 				radio: 1,
 				form: {
 					title: '',
-					firstPicture: '',
+					firstPicture: DEFAULT_FIRST_PICTURE,
 					description: '',
 					content: '',
 					cate: null,
@@ -145,8 +147,12 @@
 			}
 		},
 		watch: {
+			'form.content'(val) {
+				this.form.words = this.countWords(val)
+				this.autoFillFirstPicture(val)
+			},
 			'form.words'(newValue) {
-				this.form.readTime = newValue ? Math.round(newValue / 200) : null
+				this.form.readTime = newValue ? Math.max(1, Math.round(newValue / 200)) : null
 			},
 		},
 		created() {
@@ -176,6 +182,43 @@
 				;(blog.tags || []).forEach(item => {
 					blog.tagList.push(item.id)
 				})
+			},
+			countWords(content) {
+				if (!content) return 0
+				let text = content
+				// 代码块与行内代码不计入字数
+				text = text.replace(/```[\s\S]*?```/g, ' ')
+				text = text.replace(/`[^`]*`/g, ' ')
+				// 图片整段去掉，链接保留链接文字
+				text = text.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+				text = text.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+				// 行首标记：标题 #、引用 >、列表 -/*/+ 或 1.、分隔线 ---
+				text = text.replace(/^\s*#{1,6}\s+/gm, ' ')
+				text = text.replace(/^\s*>\s?/gm, ' ')
+				text = text.replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, ' ')
+				text = text.replace(/^\s*[-*_]{3,}\s*$/gm, ' ')
+				// 行内标记：粗体、斜体、删除线
+				text = text.replace(/\*\*([^*]+)\*\*/g, '$1')
+				text = text.replace(/__([^_]+)__/g, '$1')
+				text = text.replace(/~~([^~]+)~~/g, '$1')
+				text = text.replace(/\*([^*\n]+)\*/g, '$1')
+				text = text.replace(/_([^_\n]+)_/g, '$1')
+				// 去掉所有空白后统计字符数
+				return text.replace(/\s+/g, '').length
+			},
+			autoFillFirstPicture(content) {
+				const isDefault = !this.form.firstPicture || this.form.firstPicture === DEFAULT_FIRST_PICTURE
+				if (!isDefault) return
+				const img = this.extractFirstImage(content)
+				if (img) this.form.firstPicture = img
+			},
+			extractFirstImage(content) {
+				if (!content) return ''
+				let m = content.match(/!\[[^\]]*\]\(([^)\s]+)\)/)
+				if (m) return m[1]
+				m = content.match(/<img[^>]+src=["']([^"']+)["']/)
+				if (m) return m[1]
+				return ''
 			},
 			saveAsDraft() {
 				this.form.status = 'DRAFT'
