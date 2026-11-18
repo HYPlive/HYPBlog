@@ -16,4 +16,6 @@ public interface CommonWebsiteService {
 	void deleteWebsite(Long id);
 
 	void updatePublishedById(Long id, Boolean published);
+
+	void updateSort(List<Long> ids);
 }

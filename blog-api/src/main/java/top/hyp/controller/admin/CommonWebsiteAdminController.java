@@ -1,7 +1,5 @@
 package top.hyp.controller.admin;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +13,8 @@ import top.hyp.annotation.OperationLogger;
 import top.hyp.entity.CommonWebsite;
 import top.hyp.model.vo.Result;
 import top.hyp.service.CommonWebsiteService;
+
+import java.util.List;
 
 /**
  * @Description: 常用网站后台管理
@@ -31,12 +31,9 @@ public class CommonWebsiteAdminController {
 	 * 分页获取常用网站列表
 	 */
 	@GetMapping("/websites")
-	public Result websites(@RequestParam(defaultValue = "1") Integer pageNum,
-	                       @RequestParam(defaultValue = "10") Integer pageSize) {
-		String orderBy = "sort asc, create_time asc";
-		PageHelper.startPage(pageNum, pageSize, orderBy);
-		PageInfo<CommonWebsite> pageInfo = new PageInfo<>(commonWebsiteService.getWebsiteList());
-		return Result.ok("请求成功", pageInfo);
+	public Result websites() {
+		List<CommonWebsite> websiteList = commonWebsiteService.getWebsiteList();
+		return Result.ok("请求成功", websiteList);
 	}
 
 	/**
@@ -77,5 +74,15 @@ public class CommonWebsiteAdminController {
 	public Result deleteWebsite(@RequestParam Long id) {
 		commonWebsiteService.deleteWebsite(id);
 		return Result.ok("删除成功");
+	}
+
+	/**
+	 * 更新常用网站排序
+	 */
+	@OperationLogger("更新常用网站排序")
+	@PutMapping("/website/sort")
+	public Result updateSort(@RequestBody List<Long> ids) {
+		commonWebsiteService.updateSort(ids);
+		return Result.ok("排序更新成功");
 	}
 }
